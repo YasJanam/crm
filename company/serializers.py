@@ -9,7 +9,7 @@ class CompanySerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Company
-        fields = ['name','abbreviation','is_deleted','phone_number',
+        fields = ['name','abbreviation','is_deleted','phone',
                   'industry','email','address','description',
                   'created_at','updated_at','created_by',]
         read_only_fields = ['created_at', 'updated_at','created_by']
@@ -25,12 +25,11 @@ class CompanyContactSerializer(serializers.ModelSerializer):
     company = CompanySerializer(read_only=True)
     created_by = UserSerializer(read_only=True)
 
-    #person_id = serializers.IntegerField(write_only=True)
     company_id = serializers.IntegerField(write_only=True)
 
     class Meta:
         model = CompanyContact
-        fields = ['name','phone_number','email', 'company', 'role',
+        fields = ['name','phone','email', 'company', 'role',
                    'created_at', 'updated_at',
                      'created_by',  'is_active','is_deleted',
                      'company_id',]

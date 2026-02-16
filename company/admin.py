@@ -7,7 +7,7 @@ from .models import *
 class CompanyAdmin(admin.ModelAdmin):
     # فیلدهایی که در لیست نمایش داده می‌شوند
     list_display = ('name','abbreviation','is_deleted',
-                    'phone_number','type',
+                    'phone','type',
                     'industry','email','address','description',
                     'created_at','updated_at','created_by',)
  
@@ -26,7 +26,7 @@ class LeadAdmin(admin.ModelAdmin):
 @admin.register(CompanyContact)
 class CompanyContactAdmin(admin.ModelAdmin):
     list_display = (
-        'name','phone_number','email',
+        'name','phone','email',
         'company','role',
         'is_deleted','is_active',
        'created_at','updated_at','created_by',

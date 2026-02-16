@@ -10,7 +10,7 @@ class Company(models.Model):
     # نام اختصاری اگر داره
     abbreviation = models.CharField(max_length=200,blank=True,null=True)
 
-    phone_number = models.CharField(max_length=12)
+    phone = models.CharField(max_length=12)
     
     email = models.CharField(max_length=400)
     address = models.TextField()
@@ -39,7 +39,7 @@ class CompanyContact(models.Model):
     company = models.ForeignKey(Company,on_delete=models.CASCADE,related_name="contacts")
 
     name = models.CharField(max_length=250)
-    phone_number = models.CharField()
+    phone = models.CharField()
     email = models.CharField(max_length=400)
     role = models.CharField(max_length=250 ,blank=True,null=True)
 
@@ -84,6 +84,12 @@ class Lead(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     created_by = models.ForeignKey(User,on_delete=models.SET_NULL,blank=True,null=True)
+"""
+    def converte(self):
+        self.is_converted = True
+        self.converted_at = timezone.now()
+        self.save(update_fields=["is_converted","converted_at"])"""
+        
 
 """
     def save(self, *args, **kwargs):

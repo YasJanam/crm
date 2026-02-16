@@ -4,7 +4,7 @@ from .models import *
 from django.contrib.auth.models import User
 from accounts.serializers import UserSerializer
 from company.models import Company
-from company.serializers import CompanySerializer
+from company.serializers import CompanySerializer , LeadSerializer
 
 
 
@@ -69,6 +69,7 @@ class DealSerializer(serializers.ModelSerializer):
     assigned_to = UserSerializer(read_only=True)
 
     stages = DealStageHistorySerializer(read_only=True,many=True)
+    lead = LeadSerializer(read_only=True)
 
     company_id = serializers.IntegerField(write_only=True)
     assigned_to_id = serializers.CharField(write_only=True)
@@ -78,7 +79,8 @@ class DealSerializer(serializers.ModelSerializer):
         fields = ['company', 'title', 'amount', 'status','stages',
                     'assigned_to', 'is_deleted','probability',
                     'created_at', 'updated_at', 'created_by',
-                    'company_id','assigned_to_id',]
+                    'company_id','assigned_to_id',
+                    'lead',]
         
         read_only_fields = ['created_at', 'updated_at', 'created_by',]
 
@@ -88,9 +90,12 @@ class DealSerializer(serializers.ModelSerializer):
         validated_data['company'] = Company.objects.get(
             id = validated_data.pop('company_id')
         )
+        #if 'assigned_to_id' in validated_data:
         validated_data['assigned_to'] = User.objects.get(
             id = validated_data.pop('assigned_to_id')
         )
+        #else:
+        #    validated_data['assigned_to'] = self.context['request'].user
         return super().create(validated_data)
     
 

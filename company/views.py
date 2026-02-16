@@ -95,11 +95,11 @@ class LeadViewSet(ModelViewSet):
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
         
-
-    @action(detail=True,methods=['post'],url_path='convert')
+    
+    @action(detail=True,methods=['post'],url_path='convert-to-deal')
     def convert_lead_to_deal(self,request,pk=None):
         try:
-            lead = LeadService.convert_lead(pk)
+            _ , lead ,_ = ConvertLeadService.main(request.data,pk)
             data =LeadSerializer(lead)
             return Response(data.data,status=status.HTTP_200_OK)
         
@@ -108,7 +108,7 @@ class LeadViewSet(ModelViewSet):
                 {'error': str(e)},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             ) 
-        
+      
 
     @action(detail=True,methods=['post'],url_path='qualify')
     def qualify(self,request,pk=None):

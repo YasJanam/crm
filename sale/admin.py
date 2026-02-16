@@ -15,6 +15,7 @@ class DealAdmin(admin.ModelAdmin):
     list_display = ('company', 'title', 'amount', 'status', 
                      'assigned_to', 'is_deleted','probability',
                     'created_at', 'updated_at', 'created_by',
+                    'lead',
                     )
     
 @admin.register(Stage)
