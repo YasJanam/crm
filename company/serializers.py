@@ -25,7 +25,7 @@ class CompanyContactSerializer(serializers.ModelSerializer):
     company = CompanySerializer(read_only=True)
     created_by = UserSerializer(read_only=True)
 
-    person_id = serializers.IntegerField(write_only=True)
+    #person_id = serializers.IntegerField(write_only=True)
     company_id = serializers.IntegerField(write_only=True)
 
     class Meta:
@@ -52,7 +52,8 @@ class CompanyContactSerializer(serializers.ModelSerializer):
 
 class LeadSerializer(serializers.ModelSerializer):
     created_by = UserSerializer(read_only=True)
-    assigned_to_username = serializers.CharField(write_only=True)
+    assigned_to = UserSerializer(read_only=True)
+    assigned_to_id = serializers.CharField(write_only=True)
     class Meta:
         model = Lead
         fields = ['name','phone','email',
@@ -60,20 +61,20 @@ class LeadSerializer(serializers.ModelSerializer):
                     'status','description','is_deleted',
                     'created_at','updated_at','created_by',
                     'is_converted','converted_at',
-                    'company_id',]
+                    'company_id','assigned_to_id',]
         read_only_fields = ['created_at', 'updated_at','created_by','converted_at',]
         
     def create(self, validated_data):
         validated_data['created_by'] = self.context['request'].user
         validated_data['assigned_to'] = User.objects.get(
-            username = validated_data['assigned_to_username']
+            id = validated_data['assigned_to_id']
         )
         return super().create(validated_data)
     
 
     def update(self, instance, validated_data):
-        if 'assigned_to_username' in validated_data:
+        if 'assigned_to_id' in validated_data:
             validated_data['assigned_to'] = User.objects.get(
-            username = validated_data['assigned_to_username']
+            id = validated_data['assigned_to_id']
             )
         return super().update(instance, validated_data)

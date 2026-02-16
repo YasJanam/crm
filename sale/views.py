@@ -180,22 +180,4 @@ class DealViewSet(ModelViewSet):
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
         
-"""    
-    @action(detail=True,methods=['post'],url_path='assign-user')
-    def assign_user_by_username(self,request,pk=None):
-        try:
-            with transaction.atomic():
-                username = request.data.get('username')
-                deal = Deal.objects.get(id=pk)
-                user = User.objects.get(username=username)
-                deal.assigned_to = user
-                deal.save()
-                data = DealSerializer(deal)
-                return Response(data.data,status=status.HTTP_200_OK)
-        except Exception as e:
-            return Response(
-                {'error': str(e)},
-                status=status.HTTP_500_INTERNAL_SERVER_ERROR
-            )
-           
-        """
+        

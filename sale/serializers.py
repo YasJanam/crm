@@ -14,14 +14,14 @@ class SaleSerializer(serializers.ModelSerializer):
     saler = UserSerializer(read_only=True)
 
     company_id = serializers.IntegerField(write_only=True)
-    saler_username = serializers.CharField(write_only=True)
+    saler_id = serializers.CharField(write_only=True)
 
     class Meta:
         model = Sale
         fields = ['company','saler','amount','description',
                     'created_at','updated_at',
                     'company_id','created_by',
-                    'saler_username',
+                    'saler_id',
                     ]
         read_only_fields = ['created_at', 'updated_at','created_by',]
 
@@ -32,7 +32,7 @@ class SaleSerializer(serializers.ModelSerializer):
             id = validated_data.pop('company_id')
         )
         validated_data['saler'] = User.objects.get(
-            username = validated_data.pop('saler_username')
+            id = validated_data.pop('saler_id')
         )
         return super().create(validated_data)
     
@@ -43,9 +43,9 @@ class SaleSerializer(serializers.ModelSerializer):
             id = validated_data.pop('company_id')
         )
             
-        if 'saler_username' in validated_data:
+        if 'saler_id' in validated_data:
             validated_data['saler'] = User.objects.get(
-            username = validated_data.pop('saler_username')
+            id = validated_data.pop('saler_id')
         )
         return super().update(instance, validated_data)
     
@@ -71,14 +71,14 @@ class DealSerializer(serializers.ModelSerializer):
     stages = DealStageHistorySerializer(read_only=True,many=True)
 
     company_id = serializers.IntegerField(write_only=True)
-    assigned_to_username = serializers.CharField(write_only=True)
+    assigned_to_id = serializers.CharField(write_only=True)
 
     class Meta:
         model = Deal
         fields = ['company', 'title', 'amount', 'status','stages',
                     'assigned_to', 'is_deleted','probability',
                     'created_at', 'updated_at', 'created_by',
-                    'company_id','assigned_to_username',]
+                    'company_id','assigned_to_id',]
         
         read_only_fields = ['created_at', 'updated_at', 'created_by',]
 
@@ -89,7 +89,7 @@ class DealSerializer(serializers.ModelSerializer):
             id = validated_data.pop('company_id')
         )
         validated_data['assigned_to'] = User.objects.get(
-            username = validated_data.pop('assigned_to_username')
+            id = validated_data.pop('assigned_to_id')
         )
         return super().create(validated_data)
     
@@ -99,8 +99,8 @@ class DealSerializer(serializers.ModelSerializer):
             validated_data['company'] = Company.objects.get(
             id = validated_data.pop('company_id')
             )
-        if 'assigned_to_username' in validated_data:
+        if 'assigned_to_id' in validated_data:
             validated_data['assigned_to'] = User.objects.get(
-            username = validated_data.pop('assigned_to_username')
+            id = validated_data.pop('assigned_to_id')
             )
         return super().update(instance, validated_data)
