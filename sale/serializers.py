@@ -1,0 +1,106 @@
+
+from rest_framework import serializers
+from .models import * 
+from django.contrib.auth.models import User
+from accounts.serializers import UserSerializer
+from company.models import Company
+from company.serializers import CompanySerializer
+
+
+
+class SaleSerializer(serializers.ModelSerializer):
+    #customer = CustomerSerializer(read_only=True)
+    company = CompanySerializer(read_only=True)
+    saler = UserSerializer(read_only=True)
+
+    company_id = serializers.IntegerField(write_only=True)
+    saler_username = serializers.CharField(write_only=True)
+
+    class Meta:
+        model = Sale
+        fields = ['company','saler','amount','description',
+                    'created_at','updated_at',
+                    'company_id','created_by',
+                    'saler_username',
+                    ]
+        read_only_fields = ['created_at', 'updated_at','created_by',]
+
+
+    def create(self, validated_data):
+        validated_data['created_by'] = self.context['request'].user
+        validated_data['company'] = Company.objects.get(
+            id = validated_data.pop('company_id')
+        )
+        validated_data['saler'] = User.objects.get(
+            username = validated_data.pop('saler_username')
+        )
+        return super().create(validated_data)
+    
+
+    def update(self, instance, validated_data):
+        if 'company_id' in validated_data:
+            validated_data['company'] = Company.objects.get(
+            id = validated_data.pop('company_id')
+        )
+            
+        if 'saler_username' in validated_data:
+            validated_data['saler'] = User.objects.get(
+            username = validated_data.pop('saler_username')
+        )
+        return super().update(instance, validated_data)
+    
+
+
+class StageSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Stage
+        fields = ['name','order','is_won','is_lost',]
+
+
+class DealStageHistorySerializer(serializers.ModelSerializer):
+    stage = StageSerializer(read_only=True)
+    class Meta:
+        model = DealStageHistory
+        fields = ['deal','stage','entered_at','exited_at',]
+
+
+class DealSerializer(serializers.ModelSerializer):
+    company = CompanySerializer(read_only=True)
+    assigned_to = UserSerializer(read_only=True)
+
+    stages = DealStageHistorySerializer(read_only=True,many=True)
+
+    company_id = serializers.IntegerField(write_only=True)
+    assigned_to_username = serializers.CharField(write_only=True)
+
+    class Meta:
+        model = Deal
+        fields = ['company', 'title', 'amount', 'status','stages',
+                    'assigned_to', 'is_deleted','probability',
+                    'created_at', 'updated_at', 'created_by',
+                    'company_id','assigned_to_username',]
+        
+        read_only_fields = ['created_at', 'updated_at', 'created_by',]
+
+
+    def create(self, validated_data):
+        validated_data['created_by'] = self.context['request'].user
+        validated_data['company'] = Company.objects.get(
+            id = validated_data.pop('company_id')
+        )
+        validated_data['assigned_to'] = User.objects.get(
+            username = validated_data.pop('assigned_to_username')
+        )
+        return super().create(validated_data)
+    
+
+    def update(self, instance, validated_data):
+        if 'company_id' in validated_data:
+            validated_data['company'] = Company.objects.get(
+            id = validated_data.pop('company_id')
+            )
+        if 'assigned_to_username' in validated_data:
+            validated_data['assigned_to'] = User.objects.get(
+            username = validated_data.pop('assigned_to_username')
+            )
+        return super().update(instance, validated_data)
