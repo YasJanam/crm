@@ -90,12 +90,10 @@ class DealSerializer(serializers.ModelSerializer):
         validated_data['company'] = Company.objects.get(
             id = validated_data.pop('company_id')
         )
-        #if 'assigned_to_id' in validated_data:
-        validated_data['assigned_to'] = User.objects.get(
-            id = validated_data.pop('assigned_to_id')
-        )
-        #else:
-        #    validated_data['assigned_to'] = self.context['request'].user
+        if 'assigned_to' in validated_data:
+            validated_data['assigned_to'] = User.objects.get(
+                id = validated_data.pop('assigned_to_id')
+            )
         return super().create(validated_data)
     
 

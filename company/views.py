@@ -50,7 +50,14 @@ class CompanyContactViewSet(ModelViewSet):
     serializer_class = CompanyContactSerializer
 
     def get_queryset(self):
-        return CompanyContact.objects.filter(is_deleted=False)
+        qs = CompanyContact.objects.filter(is_deleted=False)
+        company_id = self.request.query_params.get('company_id')
+        if company_id:
+            qs = CompanyContact.objects.filter(
+                company__id=company_id,
+                is_deleted=False
+            )
+        return qs
     
     @action(detail=True,methods=['delete'],url_path='delete')
     def delete_object(self,request,pk=None):
@@ -76,9 +83,16 @@ class LeadViewSet(ModelViewSet):
     serializer_class = LeadSerializer
 
     def get_queryset(self):
-        return Lead.objects.filter(
+        qs = Lead.objects.filter(
             is_deleted=False
         )
+        user_id = self.request.query_params.get('user_id')
+        if user_id:
+            qs = Lead.objects.filter(
+                is_deleted=False,
+                assigned_to__id=user_id
+            )
+        return qs
        
     @action(detail=True,methods=['delete'],url_path='delete')
     def delete(self,request,pk=None):
@@ -139,3 +153,18 @@ class LeadViewSet(ModelViewSet):
                 {'error': str(e)},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             ) 
+
+    @action(detail=False,methods=['get'],url_path='mine')
+    def my_leads(self,request):
+        try:
+            leads = Lead.objects.filter(
+                assigned_to=request.user,
+                is_deleted=False
+                )
+            data = LeadSerializer(leads,many=True)
+            return Response(data.data,status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response(
+                {'error': str(e)},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )

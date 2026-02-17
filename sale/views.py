@@ -21,7 +21,17 @@ class SaleViewSet(ModelViewSet):
     serializer_class = SaleSerializer
 
     def get_queryset(self):
-        return Sale.objects.filter(is_deleted=False)
+        qs = Sale.objects.filter(
+            is_deleted=False,
+            )
+        user_id = self.request.query_params.get('user_id')
+        if user_id:
+            qs = Sale.objects.filter(
+                is_deleted=False,
+                saler__id=user_id
+            )
+        return qs
+
 
     @action(detail=True,methods=['delete'],url_path='delete')
     def delete_object(self,request,pk=None):
@@ -38,6 +48,21 @@ class SaleViewSet(ModelViewSet):
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
         
+    @action(detail=False,methods=['get'],url_path='mine')
+    def my_sales(self,request):
+        try:
+            sales = Sale.objects.filter(
+                saler=request.user,
+                is_deleted=False
+                )
+            data = SaleSerializer(sales,many=True)
+            return Response(data.data,status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response(
+                {'error': str(e)},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+        
 
 
 
@@ -48,10 +73,16 @@ class DealViewSet(ModelViewSet):
     serializer_class = DealSerializer
 
     def get_queryset(self):
-        return Deal.objects.filter(
+        qs = Deal.objects.filter(
             is_deleted=False,
-            #status = 'open',
             )
+        user_id = self.request.query_params.get('user_id')
+        if user_id:
+            qs = Deal.objects.filter(
+                is_deleted=False,
+                assigned_to__id=user_id
+            )
+        return qs
     
     @action(detail=True,methods=['delete'],url_path='delete')
     def delete_object(self,request,pk=None):
@@ -164,12 +195,12 @@ class DealViewSet(ModelViewSet):
             )
     
 
-    @action(detail=True,methods=['post'],url_path='assign-user')
-    def assign_user_byid(self,request,pk=None,userid=None):
+    @action(detail=True,methods=['post'],url_path='assign-user/(?P<user_id>[^/.]+)')
+    def assign_user_byid(self,request,pk=None,user_id=None):
         try:
             with transaction.atomic():
                 deal = Deal.objects.get(id=pk)
-                user = User.objects.get(id=userid)
+                user = User.objects.get(id=user_id)
                 deal.assigned_to = user
                 deal.save()
                 data = DealSerializer(deal)
@@ -180,4 +211,32 @@ class DealViewSet(ModelViewSet):
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
         
+
+
+    @action(detail=False,methods=['get'],url_path='mine')
+    def my_deals(self,request):
+        try:
+            deals = Deal.objects.filter(
+                assigned_to=request.user,
+                is_deleted=False
+                )
+            data = DealSerializer(deals,many=True)
+            return Response(data.data,status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response(
+                {'error': str(e)},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
         
+    @action(detail=False,methods=['post'],url_path='create/by-assigned-user/')
+    def create_my_deal(self,request):
+        try:
+            serializer = DealSerializer(data=request.data)
+            serializer.is_valid(raise_exception=True)
+            serializer.save(assigned_to=request.user)
+            return Response(serializer.data)
+        except Exception as e:
+            return Response(
+                {'error': str(e)},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+                )
