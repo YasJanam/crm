@@ -9,14 +9,13 @@ class CompanySerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Company
-        fields = ['name','abbreviation','is_deleted','phone',
+        fields = ['name','abbreviation','phone','is_deleted',
                   'industry','email','address','description',
                   'created_at','updated_at','created_by',]
         read_only_fields = ['created_at', 'updated_at','created_by']
         
     def create(self, validated_data):
-        user = self.context['request'].user
-        validated_data['created_by'] = user
+        validated_data['created_by'] = self.context['request'].user
         return super().create(validated_data)
     
 
@@ -65,9 +64,10 @@ class LeadSerializer(serializers.ModelSerializer):
         
     def create(self, validated_data):
         validated_data['created_by'] = self.context['request'].user
-        validated_data['assigned_to'] = User.objects.get(
-            id = validated_data['assigned_to_id']
-        )
+        if 'assigned_to_id' in validated_data:
+            validated_data['assigned_to'] = User.objects.get(
+                id = validated_data['assigned_to_id']
+            )
         return super().create(validated_data)
     
 

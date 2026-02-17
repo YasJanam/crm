@@ -93,7 +93,7 @@ class LeadViewSet(ModelViewSet):
                 assigned_to__id=user_id
             )
         return qs
-       
+           
     @action(detail=True,methods=['delete'],url_path='delete')
     def delete(self,request,pk=None):
         try:

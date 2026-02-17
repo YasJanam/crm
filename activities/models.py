@@ -1,5 +1,5 @@
 from django.db import models
-from company.models import Company
+from company.models import Company , Lead
 from sale.models import Deal
 from django.contrib.auth.models import User
 from django.core.validators import MinValueValidator , MaxValueValidator
@@ -36,6 +36,7 @@ class Interaction(models.Model):
 
 
 
+
 class Task(models.Model):
 
     class Status(models.TextChoices):
@@ -44,8 +45,12 @@ class Task(models.Model):
         DONE = 'done' , 'Done'
         CANCELLED = 'cancelled' , 'Cancelled'
 
-    company = models.ForeignKey(Company,on_delete=models.CASCADE,related_name='tasks')
-    deal = models.ForeignKey(Deal,on_delete=models.CASCADE,blank=True,null=True)
+    company = models.ForeignKey(Company,on_delete=models.CASCADE,
+                                related_name='tasks',blank=True,null=True)
+    deal = models.ForeignKey(Deal,on_delete=models.CASCADE,
+                             related_name='tasks',blank=True,null=True)
+    lead = models.ForeignKey(Lead,on_delete=models.CASCADE,
+                             related_name='tasks',blank=True,null=True)
 
     title = models.CharField(max_length=255)
     description = models.TextField(blank=True,null=True)
@@ -64,7 +69,21 @@ class Task(models.Model):
 
 
 
-"""
-class Reminder(models.Model):
 
-"""
+class Reminder(models.Model):
+    title = models.CharField(max_length=300,blank=True,null=True)
+    description = models.TextField(null=True,blank=True)
+
+    remind_at  = models.DateTimeField()
+    user = models.ForeignKey(User,on_delete=models.CASCADE,null=True,blank=True)
+    is_sent = models.BooleanField(default=False)
+
+    class ReminderType(models.TextChoices):
+        EMAIL = 'ایمیل','email'
+        NOTIFICATION = 'نوتیف' , 'notification'
+        SMS = 'پیامک' , 'sms'
+
+    method = models.CharField(max_length=30,choices=ReminderType.choices,
+                              default=ReminderType.NOTIFICATION,blank=True)
+    
+    created_at = models.DateTimeField(auto_now_add=True)

@@ -28,6 +28,6 @@ class CompanyContactAdmin(admin.ModelAdmin):
     list_display = (
         'name','phone','email',
         'company','role',
-        'is_deleted','is_active',
+        'is_active',  'is_deleted',
        'created_at','updated_at','created_by',
     )

@@ -240,3 +240,16 @@ class DealViewSet(ModelViewSet):
                 {'error': str(e)},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
                 )
+        
+
+class NegotiationViewSet(ModelViewSet):
+    queryset = Negotiation.objects.all()
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [JWTAuthentication]
+    serializer_class = NegotiationSerializer
+
+    def get_queryset(self):
+        qs = Negotiation.objects.filter(
+            is_deleted=False
+        )
+        return qs

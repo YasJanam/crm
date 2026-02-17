@@ -32,8 +32,8 @@ class DealStageHistoryAdmin(admin.ModelAdmin):
 
 @admin.register(Negotiation)
 class NegotiationAdmin(admin.ModelAdmin):
-    list_display = ('deal', 'negotiator', 'proposed_amount', 'description', 
-                    'result', 'is_deleted', 'created_at', 
-                    'updated_at', 'created_by',)
+    list_display = ('deal', 'negotiator', 'proposed_amount', 'discount_percent', 'title',
+                     'goal', 'summary', 'description', 'result', 'start_time', 'end_time',
+                       'is_deleted', 'created_at', 'updated_at', 'created_by',)
 
 

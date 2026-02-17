@@ -6,17 +6,6 @@ from django.utils import timezone
 from django.db import transaction
 
 
-class Sale(models.Model):
-    company = models.ForeignKey(Company,on_delete=models.SET_NULL,blank=True,null=True)
-    saler = models.ForeignKey(User,on_delete=models.CASCADE,related_name='sales') # created by = sale agent
-    amount = models.IntegerField(blank=True,null=True)
-
-
-    description = models.TextField(blank=True,null=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-    created_by = models.ForeignKey(User,on_delete=models.SET_NULL,blank=True,null=True)
-
 
 
 class Stage(models.Model):
@@ -84,20 +73,6 @@ class DealStageHistory(models.Model):
     exited_at = models.DateTimeField(null=True,blank=True,default=None)
 
 
-"""
-    def save(self, *args, **kwargs):
-    
-        if self.pk:  
-            original = Deal.objects.get(pk=self.pk)
-            if original.is_current_stage == False and self.is_current_stage == True: 
-                self.start_at = timezone.now()
-                self.end_at = None
-
-            if original.is_current_stage == True and self.is_current_stage == False:
-                    self.end_at = timezone.now()
-        super().save(*args, **kwargs)"""
-
-
 
 
 class Negotiation(models.Model):
@@ -119,12 +94,28 @@ class Negotiation(models.Model):
     description = models.TextField(blank=True,null=True)
     result = models.TextField(blank=True)
 
-    start_time = models.DateTimeField()
-    end_time = models.DateTimeField()
+    start_time = models.DateTimeField(null=True,blank=True)
+    end_time = models.DateTimeField(null=True,blank=True)
 
     is_deleted = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     created_by = models.ForeignKey(User,on_delete=models.SET_NULL,blank=True,null=True)
 
+
+
+
+
+class Sale(models.Model):
+    deal = models.ForeignKey(Deal,on_delete=models.CASCADE,blank=True,null=True)
+
+    company = models.ForeignKey(Company,on_delete=models.SET_NULL,blank=True,null=True)
+    saler = models.ForeignKey(User,on_delete=models.CASCADE,related_name='sales') 
+    amount = models.IntegerField(blank=True,null=True)
+
+
+    description = models.TextField(blank=True,null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    created_by = models.ForeignKey(User,on_delete=models.SET_NULL,blank=True,null=True)
 
