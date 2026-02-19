@@ -11,14 +11,17 @@ from company.serializers import CompanySerializer , LeadSerializer
 class StageSerializer(serializers.ModelSerializer):
     class Meta:
         model = Stage
-        fields = ['name','order','is_won','is_lost',]
+        fields = ['name','order',#'is_won','is_lost',
+                  'is_terminal',
+                  ]
 
 
 class DealStageHistorySerializer(serializers.ModelSerializer):
     stage = StageSerializer(read_only=True)
     class Meta:
         model = DealStageHistory
-        fields = ['deal','stage','entered_at','exited_at',]
+        fields = ['deal','stage','entered_at','exited_at',
+                  'is_lost',]
 
 
 class DealSerializer(serializers.ModelSerializer):
@@ -37,7 +40,8 @@ class DealSerializer(serializers.ModelSerializer):
                     'assigned_to', 'is_deleted','probability',
                     'created_at', 'updated_at', 'created_by',
                     'company_id','assigned_to_id',
-                    'lead',]
+                    'lost_reason',
+                    'lead','closed_at',]
         
         read_only_fields = ['created_at', 'updated_at', 'created_by',]
 

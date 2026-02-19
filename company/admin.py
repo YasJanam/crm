@@ -20,6 +20,7 @@ class LeadAdmin(admin.ModelAdmin):
                     'assigned_to','company_name',
                     'status','description','is_deleted',
                     'is_converted','converted_at',
+                    'source',
                     'created_at','updated_at','created_by',)
 
 

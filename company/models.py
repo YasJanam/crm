@@ -75,6 +75,13 @@ class Lead(models.Model):
     status = models.CharField(choices=Status.choices,verbose_name='status',
                               default=Status.NEW,blank=True)
     
+    class Source(models.TextChoices):
+        GOOGLE_ADS = 'google_ads','Google Ads'
+        CONTENT_MARKETING = 'content_marketing','Content Marketing'
+        REFERRAL = 'referral','Refferal'
+
+    source = models.CharField(max_length=200,choices=Source.choices,default=Source.GOOGLE_ADS)
+    
     # convert to deal
     is_converted = models.BooleanField(default=False,blank=True)
     converted_at = models.DateTimeField(blank=True,null=True,default=None)

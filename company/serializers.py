@@ -59,6 +59,7 @@ class LeadSerializer(serializers.ModelSerializer):
                     'status','description','is_deleted',
                     'created_at','updated_at','created_by',
                     'is_converted','converted_at',
+                    'source',
                     'company_id','assigned_to_id',]
         read_only_fields = ['created_at', 'updated_at','created_by','converted_at',]
         

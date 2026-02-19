@@ -15,13 +15,14 @@ class DealAdmin(admin.ModelAdmin):
     list_display = ('company', 'title', 'amount', 'status', 
                      'assigned_to', 'is_deleted','probability',
                     'created_at', 'updated_at', 'created_by',
-                    'lead',
+                    'lead','closed_at','lost_reason',
                     )
     
 @admin.register(Stage)
 class StageAdmin(admin.ModelAdmin):
     list_display = (
-        'name','order','is_won','is_lost',
+        'name','order',#'is_won','is_lost',
+        'is_terminal',
     )
 
 @admin.register(DealStageHistory)

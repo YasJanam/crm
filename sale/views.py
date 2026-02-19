@@ -14,6 +14,47 @@ from django.db import transaction
 
 
 
+
+class DealStageHistoryViewSet(ModelViewSet):
+    queryset = DealStageHistory.objects.all()
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [JWTAuthentication]
+    serializer_class = DealStageHistorySerializer
+
+    def get_queryset(self):
+        qs = DealStageHistory.objects.filter(
+            is_deleted=False
+        )
+        return qs 
+    
+
+
+class StageViewSet(ModelViewSet):
+    queryset = Stage.objects.all()
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [JWTAuthentication]
+    serializer_class = StageSerializer
+
+    def get_queryset(self):
+        qs = Stage.objects.filter(
+            is_deleted=False
+        )
+        return qs      
+    
+
+class NegotiationViewSet(ModelViewSet):
+    queryset = Negotiation.objects.all()
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [JWTAuthentication]
+    serializer_class = NegotiationSerializer
+
+    def get_queryset(self):
+        qs = Negotiation.objects.filter(
+            is_deleted=False
+        )
+        return qs
+    
+    
 class SaleViewSet(ModelViewSet):
     queryset = Sale.objects.all()
     permission_classes = [IsAuthenticated]
@@ -64,6 +105,7 @@ class SaleViewSet(ModelViewSet):
             )
         
 
+    
 
 
 class DealViewSet(ModelViewSet):
@@ -88,6 +130,9 @@ class DealViewSet(ModelViewSet):
     def delete_object(self,request,pk=None):
         try:
             with transaction.atomic():
+                """
+                حتما بعدا حذف نرم رو درست کن. استیج های وصل شده به این دیل هم باید حذف نرم
+                """
                 obj = self.get_object()  
                 obj.is_deleted = True
                 obj.save()
@@ -100,12 +145,13 @@ class DealViewSet(ModelViewSet):
             )
         
 
-    @action(detail=True,methods=['post'],url_path='close')
-    def close_deal(self,request,pk=None):
+    @action(detail=True,methods=['post'],url_path='win')
+    def win_deal(self,request,pk=None):
         try:
             with transaction.atomic():
                 obj = self.get_object()
-                obj.status = obj.Status.CLOSED
+                obj.status = Deal.Status.WON  #obj.Status.WIN
+                obj.closed_at = timezone.now()
                 obj.save()
                 data = DealSerializer(obj)
                 return Response(data.data,status=status.HTTP_200_OK)
@@ -114,7 +160,24 @@ class DealViewSet(ModelViewSet):
                 {'error': str(e)},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
-        
+
+    @action(detail=True,methods=['post'],url_path='lost')
+    def lost_deal(self,request,pk=None):
+        try:
+            with transaction.atomic():
+                obj = self.get_object()
+                obj.status = Deal.Status.LOST #obj.Status.LOST
+                obj.closed_at = timezone.now()
+                obj.lost_reason = request.data.get('lost_reason')
+                obj.save()
+                data = DealSerializer(obj)
+                return Response(data.data,status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response(
+                {'error': str(e)},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+            
 
     @action(detail=True,methods=['post'],url_path='open')
     def open_deal(self,request,pk=None):
@@ -171,7 +234,7 @@ class DealViewSet(ModelViewSet):
                 stage_order = request.data.get('stage_order')
                 
                 stage = Stage.objects.get(order=stage_order)
-                if stage.is_lost or stage.is_won:
+                if stage.is_terminal:
                     raise ValidationError({
                         "error":"deal_closed",
                         "detail":"Cannot move stage because this deal is already closed"
@@ -240,16 +303,3 @@ class DealViewSet(ModelViewSet):
                 {'error': str(e)},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
                 )
-        
-
-class NegotiationViewSet(ModelViewSet):
-    queryset = Negotiation.objects.all()
-    permission_classes = [IsAuthenticated]
-    authentication_classes = [JWTAuthentication]
-    serializer_class = NegotiationSerializer
-
-    def get_queryset(self):
-        qs = Negotiation.objects.filter(
-            is_deleted=False
-        )
-        return qs
