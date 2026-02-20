@@ -1,5 +1,5 @@
-from .models import *
-from .serializers import *
+from sale.models import *
+from sale.serializers import *
 from django.db import transaction
 from django.utils import timezone
 from django.core.exceptions import ValidationError
@@ -7,7 +7,7 @@ from django.db.models import Sum
 from django.db.models import F, Func, FloatField, Avg
 from django.db.models import Q
 from decimal import Decimal
-"""
+
 class DateTimeDifference(Func):
     function = 'EXTRACT'
     template = "EXTRACT(EPOCH FROM %(function)s::timestamp - %(expressions)s::timestamp) / 86400" # محاسبه تفاضل بر حسب روز
@@ -15,9 +15,13 @@ class DateTimeDifference(Func):
 
 
 
+
     
 class FunnelAnalytics:
     
+    """
+    simple OCR : created deals / created leads
+    """
     @classmethod
     def leadToDealRate(cls,start_time=None,end_time=None):
         lead_filter = Q()
@@ -142,31 +146,30 @@ class FunnelAnalytics:
 
   
 
-    @classmethod
+    @classmethod  
     def totalRevenue(cls,start_time=None,end_time=None):
         time_filter = Q()
 
         if start_time:
-            time_filter &= Q( created_at__gte = start_time)
+            time_filter &= Q( closed_at__gte = start_time)
         if end_time:
-            time_filter &= Q(created_at__lte = end_time)  
+            time_filter &= Q(closed_at__lte = end_time)  
             
         return Deal.objects.filter(
             #is_deleted=False,
             status = Deal.Status.WON,
         ).filter(time_filter).aggregate(
             total=Sum('amount')
-        )['total'] or 0      
-    
-
+        )['total'] or 0   
 
     
+    # شرط اینو باید درست کنم ---> یک مشکلی داره فیلتر زمانش
     @classmethod
     def forecastRevenue(cls,start_time=None,end_time=None):
         time_filter = Q()
 
         if start_time:
-            time_filter &= Q( created_at__gte = start_time)
+            time_filter &= Q( created_at__gte = start_time) 
         if end_time:
             time_filter &= Q(created_at__lte = end_time) 
             
@@ -371,4 +374,288 @@ class FunnelAnalytics:
         ).count()
 
         return (reason_deals / lost_deals)*100 if lost_deals > 0 else 0 
-"""
+
+    # ==================================================================================================
+    # --------------------------------------- STRATEGIC CRM KPIs ---------------------------------------
+
+    """
+    pipeline velocity :
+    (number of deals * average deal size * win rate) / length of sale cycle
+    """
+    @classmethod
+    def pipeline_velocity(cls,start_time=None,end_time=None):
+        deal_time_filter = Q()
+
+        if start_time:
+            deal_time_filter &= Q(closed_at__gt = start_time) | Q(closed_at__isnull=True)
+        if end_time:
+            deal_time_filter &= Q(created_at__lt = end_time) 
+
+        deals = Deal.objects.filter(
+            deal_time_filter
+        ).count() 
+
+        average_deal_size = cls.averageDealSize(start_time,end_time)
+
+        win_rate = cls.winRates(start_time,end_time)
+
+        sale_cycle = cls.averageSalesCycle(start_time,end_time)
+
+        if sale_cycle == 0:
+            return 0
+        return (deals * average_deal_size * win_rate) / sale_cycle
+        
+
+
+    """
+    اگر زمان ها خالی باشند به طور خودکار مقدار دهی میشوند
+    برای این فرمول مقادیر بازهِ زمانی لازم هست. چون یک مقایسه صورت میگیرد
+
+    """
+    @classmethod
+    def revenue_growth_rate(cls,days=30,start_time=None,end_time=None,default_days=60):
+        if not end_time:
+            end_time = timezone.now()
+        if not start_time:
+            start_time = end_time - timedelta(default_days)
+
+        previous_start = start_time - timedelta(days)
+        previous_end = end_time - timedelta(days)
+
+        revenue = cls.totalRevenue(start_time,end_time)
+        previos_revenue = cls.totalRevenue(previous_start,previous_end)
+
+        if previos_revenue == 0:
+            return 0
+        return ((revenue - previos_revenue) / previos_revenue) * 100
+    
+
+
+    """
+    forecast_accuracy:
+    (Actual-Revenue / Forecast-Revanue) * 100   
+    """
+    @classmethod
+    def forecast_accuracy(cls,start_time=None,end_time=None):
+        time_filter = Q()
+
+        if start_time:
+            time_filter &= Q(closed_at__gt=start_time)
+        if end_time:
+            time_filter &= Q(closed_at__lt = end_time)
+
+        closed_deals = Deal.objects.filter(
+            status__in = [Deal.Status.WON,Deal.Status.LOST]
+        ).filter(
+            time_filter
+        )
+
+        forecast = closed_deals.aggregate(
+            total = Sum(F('amount')*F('probability')/100)
+        )['total'] or 0
+
+        actual = closed_deals.filter(
+            status = Deal.Status.WON
+        ).aggregate(
+            total = Sum(F('amount'))
+        )['total'] or 0
+
+        if forecast == 0:
+            return 0
+        
+        return (actual / forecast) * 100
+    
+
+
+    @classmethod
+    def customer_concentration(cls,company,start_time=None,end_time=None):
+        time_filter = Q()
+
+        if start_time:
+            time_filter &= Q(closed_at__gt=start_time)
+        if end_time:
+            time_filter &= Q(closed_at__lt=end_time)
+
+        customer_revenue = Deal.objects.filter(
+            status = Deal.Status.WON,
+            company = company
+        ).filter(
+            time_filter
+        ).aggregate(
+            total = Sum(F('amount'))
+        )['total'] or 0
+
+        revenue = cls.totalRevenue(start_time,end_time)
+
+        if revenue == 0:
+            return 0
+        
+        return (customer_revenue/revenue) * 100
+    
+
+    @classmethod
+    def top_customer_concentration(cls,top_n=5,start_time=None,end_time=None):
+        time_filter = Q()
+
+        if start_time:
+            time_filter &= Q(closed_at__gt=start_time)
+        if end_time:
+            time_filter &= Q(closed_at__lt = end_time)
+
+        customer_revenues = Deal.objects.filter(
+            status = Deal.Status.WON
+        ).filter(
+            time_filter
+        ).values('company').annotate(
+            total = Sum('amount')
+        ).order_by('-total')[:top_n]
+
+        total_top = sum([item['total'] for item in customer_revenues])
+        total_revenue = cls.totalRevenue(start_time,end_time)
+
+        if total_revenue == 0:
+            return 0
+        
+        return (total_top / total_revenue) * 100
+    
+
+
+    @classmethod
+    def pipeline_coverage_ratio(cls,goal,start_time,end_time):
+        time_filter = Q()
+        """
+        این فیلتر برای پیدا کردن دیل هایی هست که توی باز گفته شده باز بودن
+        """
+        if start_time:
+            time_filter &= Q(closed_at__gt = start_time) | Q(closed_at__isnull=True)
+        if end_time:
+            time_filter &= Q(created_at__lt = end_time) 
+
+        pipeline_value = Deal.objects.filter(
+            time_filter,
+            Q(amount__isnull=False)
+        ).aggregate(
+            total = Sum(F('amount'))
+        )['total'] or 0
+
+        if goal == 0:
+            return float('inf') if pipeline_value > 0 else 0
+        
+        return pipeline_value / goal
+    
+
+
+    @classmethod
+    def weighted_pipeline(cls,start_time=None,end_time=None):
+        time_filter = Q()
+        """
+        این فیلتر برای پیدا کردن دیل هایی هست که توی باز گفته شده باز بودن
+        """
+        if start_time:
+            time_filter &= Q(closed_at__gt = start_time) | Q(closed_at__isnull=True)
+        if end_time:
+            time_filter &= Q(created_at__lt = end_time) 
+        
+        amount = Deal.objects.filter(
+            time_filter,
+            Q(amount__isnull=False),
+            Q(probability__isnull=False)
+        ).annotate(
+            weighted = F('amount')*F('probability')/100
+        ).aggregate(
+            total = Sum('weighted')
+        )['total'] or 0
+
+        return amount  
+
+
+    @classmethod
+    def rep_revenue(cls,user,start_time=None,end_time=None):
+        time_filter = Q()
+
+        if start_time:
+            time_filter &= Q(closed_at__gt = start_time) 
+        if end_time:
+            time_filter &= Q(closed_at__lt = end_time)   
+
+        revene = Deal.objects.filter(
+            assigned_to = user,
+            status = Deal.Status.WON
+        ).filter(
+            time_filter
+        ).aggregate(
+            total = Sum('amount')
+        )['total'] or 0
+
+        return revene
+
+    """
+    (rep revenue / assigned quota) * 100
+    """
+    @classmethod
+    def quota_attainment_rate(cls,user_rep,quota,start_time=None,end_time=None):
+        rep_revenue = cls.rep_revenue(user_rep,start_time,end_time)    
+
+        if quota == 0:
+            return float('inf') if rep_revenue > 0 else 0
+        return (rep_revenue / quota) * 100  
+    
+
+    """
+    sale-productivity -> (revenue / sale time)
+
+    دو متد زیر باید چک شوند
+    حذف شود ؟؟ sale آیا نیاز هست مدل 
+    """
+    @classmethod
+    def sale_productivity(cls,sale):
+        sale_hours = DateTimeDifference(sale.deal.closed_at,sale.deal.created_at)
+        return sale.deal.amount / sale_hours if sale_hours!=0 else 0
+    
+    @classmethod
+    def sales_productivity_average(cls,start_time=None,end_time=None):
+        time_filter = Q()
+        if start_time:
+            time_filter &= Q(deal__created_at__gt=start_time)
+        if end_time:
+            time_filter &= Q(deal__created_at__lt=end_time)
+
+        average = Sale.objects.filter(
+            deal__closed_at__isnull =False,
+            deal__amount__isnull =False
+        ).filter(
+            time_filter
+        ).annotate(
+            times = DateTimeDifference(F('deal.closed_at'),F('deal.created_at'))
+        ).aggregate(
+            total_amount = Sum('deal__amount'),
+            total_time = Sum('times')
+        )
+
+        amount = average['total_amount']
+        time = average['total_time']
+
+        return amount/time if time!=0 else 0
+    
+
+    """
+    revenue per active deal -> active = open
+    (total revenue / open deals)
+    پتانسیل درآمدی آینده
+    این فرمول روی دیل های باز کار میکنه
+
+    """
+    @classmethod  
+    def revenue_per_active_deal(cls,start_time,end_time):
+        time_filter = Q()
+
+        if start_time:
+            time_filter &= Q( created_at__gte = start_time)
+        if end_time:
+            time_filter &= Q(created_at__lte = end_time)  
+            
+        return Deal.objects.filter(
+            status = Deal.Status.OPEN,
+        ).filter(time_filter).aggregate(
+            total=Avg('amount')
+        )['total'] or 0  

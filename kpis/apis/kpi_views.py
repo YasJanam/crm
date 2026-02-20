@@ -7,11 +7,11 @@ from rest_framework.views import APIView
 from rest_framework.decorators import api_view
 from django.core.exceptions import ValidationError
 from datetime import date
-from .models import *
-from .serializers import *
-#from .services import FunnelAnalytics
+from sale.models import *
+from sale.serializers import *
+from ..services.kpis import FunnelAnalytics
 
-"""
+  
 def _get_start_end_times(request):
 
     start_time_str = request.data.get('start_time')
@@ -177,4 +177,3 @@ def lost_reason_percentage(request):
     return rate 
 
 
-"""

@@ -35,6 +35,7 @@ INSTALLED_APPS = [
     'company',
     'activities',
     'sale.apps.SaleConfig',
+    'kpis',
     
 
     'django.contrib.admin',
