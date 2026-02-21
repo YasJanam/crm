@@ -47,7 +47,6 @@ class FunnelAnalytics:
     
 
     
-   
     
     @classmethod
     def winRates(cls,start_time=None,end_time=None):
@@ -601,42 +600,6 @@ class FunnelAnalytics:
         return (rep_revenue / quota) * 100  
     
 
-    """
-    sale-productivity -> (revenue / sale time)
-
-    دو متد زیر باید چک شوند
-    حذف شود ؟؟ sale آیا نیاز هست مدل 
-    """
-    @classmethod
-    def sale_productivity(cls,sale):
-        sale_hours = DateTimeDifference(sale.deal.closed_at,sale.deal.created_at)
-        return sale.deal.amount / sale_hours if sale_hours!=0 else 0
-    
-    @classmethod
-    def sales_productivity_average(cls,start_time=None,end_time=None):
-        time_filter = Q()
-        if start_time:
-            time_filter &= Q(deal__created_at__gt=start_time)
-        if end_time:
-            time_filter &= Q(deal__created_at__lt=end_time)
-
-        average = Sale.objects.filter(
-            deal__closed_at__isnull =False,
-            deal__amount__isnull =False
-        ).filter(
-            time_filter
-        ).annotate(
-            times = DateTimeDifference(F('deal.closed_at'),F('deal.created_at'))
-        ).aggregate(
-            total_amount = Sum('deal__amount'),
-            total_time = Sum('times')
-        )
-
-        amount = average['total_amount']
-        time = average['total_time']
-
-        return amount/time if time!=0 else 0
-    
 
     """
     revenue per active deal -> active = open
