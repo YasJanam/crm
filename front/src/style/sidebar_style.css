@@ -1,0 +1,223 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: #ffffff;
+}
+
+/* دشبورد */
+.sidebar_container {
+  display: flex;
+  direction: ltr;
+  min-height: 100vh;
+}
+
+/* سایدبار */
+.sidebar {
+  width: 220px;
+  background: white;
+  color: rgb(0, 0, 0);
+  padding: 25px 20px;
+ 
+  border-right: 1.5px solid #e0e0e0; 
+
+}
+
+.sidebar h2 {
+  text-align: center;
+  margin-bottom: 35px;
+  padding-bottom: 15px;
+  border-bottom: 2px solid rgba(255, 255, 255, 0.2);
+  font-size: 1.6rem;
+}
+
+/* آیتم‌های منو */
+.menu-section {
+  margin-bottom: 10px;
+}
+
+.menu-item {
+  padding: 16px 20px;
+  background-color: rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  margin-bottom: 3px;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: all 0.3s ease;
+  border: 1.5px solid transparent;
+  border-color: #e3e3e3;
+  border-radius: 3px;
+  font-size: 1.1rem;
+}
+
+.menu-item:hover {
+  background-color: rgba(192, 192, 192, 0.2);
+  border-color: rgba(55, 55, 55, 0.3);
+  transform: translateX(9px);
+
+}
+
+.menu-item.active {
+  background-color: rgba(146, 146, 146, 0.2);
+  transform: translateX(12px);
+  font-size: 1rem;
+
+}
+
+/*.menu-arrow {
+  font-size: 20px;
+  opacity: 0.8;
+}*/
+
+/* زیرمنو */
+/*
+.submenu {
+  background-color: rgba(0, 0, 0, 0.2);
+  border-radius: 0 0 10px 10px;
+  overflow: hidden;
+  animation: slideDown 0.3s ease;
+  margin: 0 15px 15px 15px;
+}*/
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+    max-height: 0;
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+    max-height: 200px;
+  }
+}
+/*
+.submenu-item {
+  padding: 14px 25px;
+  cursor: pointer;
+  transition: all 0.2s;
+  border-right: 4px solid transparent;
+  font-size: 1rem;
+}
+
+.submenu-item:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  border-right-color: #4dabf7;
+}
+
+.submenu-item.active {
+  background-color: rgba(255, 255, 255, 0.15);
+  border-right-color: #339af0;
+  font-weight: bold;
+}*/
+
+/* محتوای اصلی */
+.content {
+  flex: 1;
+  padding: 8px;
+  background-color: #ffffff;
+  overflow-y: auto;
+  margin-bottom: 5%;
+}
+
+.page {
+  background: white;
+  padding: 35px;
+  border-radius: 15px;
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+  min-height: 400px;
+}
+
+.page h1 {
+  color: #1e3c72;
+  margin-bottom: 25px;
+  font-size: 2rem;
+  border-bottom: 3px solid #4dabf7;
+  padding-bottom: 15px;
+}
+
+.page p {
+  color: #555;
+  line-height: 1.8;
+  font-size: 1.1rem;
+}
+
+/* فرم */
+form {
+  margin-top: 20px;
+}
+
+input {
+  padding: 12px;
+  width: 300px;
+  border: 2px solid #ddd;
+  border-radius: 8px;
+  font-size: 1rem;
+  margin-bottom: 15px;
+}
+
+button {
+  background: #1e3c72;
+  color: white;
+  padding: 12px 25px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: background 0.3s;
+}
+
+button:hover {
+  background: #2a5298;
+}
+
+/* جدول */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+
+table td {
+  padding: 12px;
+  border: 1px solid #ddd;
+}
+
+/* لیست */
+ul {
+  margin-top: 20px;
+  padding-right: 20px;
+}
+
+li {
+  padding: 10px;
+  background: #f8f9fa;
+  margin-bottom: 10px;
+  border-radius: 5px;
+}
+
+/* ریسپانسیو */
+@media (max-width: 768px) {
+  .dashboard {
+    flex-direction: column;
+  }
+  
+  .sidebar {
+    width: 100%;
+    padding: 20px;
+  }
+  
+  .content {
+    padding: 25px;
+  }
+  
+  .page {
+    padding: 25px;
+  }
+}

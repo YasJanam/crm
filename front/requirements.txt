@@ -1,0 +1,4 @@
+react-hot-toast
+react
+react-router-dom 
+axios

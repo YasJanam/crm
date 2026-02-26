@@ -9,8 +9,9 @@ class CompanySerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Company
-        fields = ['name','abbreviation','phone','is_deleted',
+        fields = ['id','name','abbreviation','phone','is_deleted',
                   'industry','email','address','description',
+                  'type',
                   'created_at','updated_at','created_by',]
         read_only_fields = ['created_at', 'updated_at','created_by']
         
@@ -28,7 +29,7 @@ class CompanyContactSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = CompanyContact
-        fields = ['name','phone','email', 'company', 'role',
+        fields = ['id','name','phone','email', 'company', 'role',
                    'created_at', 'updated_at',
                      'created_by',  'is_active','is_deleted',
                      'company_id',]

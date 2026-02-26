@@ -23,7 +23,8 @@ class CompanyViewSet(ModelViewSet):
     serializer_class = CompanySerializer
 
     def get_queryset(self):
-        return Company.objects.filter(is_deleted=False)
+        qs = Company.objects.filter(is_deleted=False)
+        return qs
     
     @action(detail=True,methods=['delete'],url_path='delete')
     def delete_company(self,request,pk=None):
@@ -50,15 +51,16 @@ class CompanyContactViewSet(ModelViewSet):
     serializer_class = CompanyContactSerializer
 
     def get_queryset(self):
-        qs = CompanyContact.objects.filter(is_deleted=False)
+        qs = CompanyContact.objects.filter(company__is_deleted=False)
+
         company_id = self.request.query_params.get('company_id')
         if company_id:
-            qs = CompanyContact.objects.filter(
+            qs = qs.filter(
                 company__id=company_id,
-                is_deleted=False
             )
         return qs
     
+
     @action(detail=True,methods=['delete'],url_path='delete')
     def delete_object(self,request,pk=None):
         try:

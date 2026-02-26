@@ -18,6 +18,9 @@ class Stage(models.Model):
     #is_won = models.BooleanField(default=False,blank=True)
     #is_lost = models.BooleanField(default=False,blank=True)
 
+    def __str__(self):
+        return f"{self.name}({self.order})"
+
 
 
 class Deal(models.Model):
@@ -72,6 +75,9 @@ class Deal(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     created_by = models.ForeignKey(User,on_delete=models.SET_NULL,blank=True,null=True)
+
+    def __str__(self):
+        return f"{self.title}({self.company.name})"
 
 
     def move_to_stage(self,new_stage):

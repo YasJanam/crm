@@ -17,7 +17,7 @@ class Company(models.Model):
 
     class Type(models.TextChoices):
         PROSPECT = 'prospect','Prospect'
-        CUSTOMER = 'Customer','customer'
+        CUSTOMER = 'customer','Customer'
 
     type = models.CharField(max_length=20,choices=Type.choices,default=Type.PROSPECT)
 
@@ -30,6 +30,9 @@ class Company(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     created_by = models.ForeignKey(User,on_delete=models.SET_NULL,blank=True,null=True)
+
+    def __str__(self):
+        return f"{self.name}"
 
 
 
@@ -44,8 +47,10 @@ class CompanyContact(models.Model):
     role = models.CharField(max_length=250 ,blank=True,null=True)
 
     
-    is_deleted = models.BooleanField(default=False,blank=True)
+    #is_deleted = models.BooleanField(default=False,blank=True)
+    #delete_concat = models.BooleanField(default=False,blank=True)
 
+    #is_primary = models.BooleanField(default=True,blank=True)
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -55,7 +60,10 @@ class CompanyContact(models.Model):
 
     @property
     def is_deleted(self):
-        return self.person.is_deleted or self.company.is_deleted    
+        return self.company.is_deleted #or self.delete_concat  
+    
+    def __str__(self):
+        return f"{self.name}({self.company.name})"
 
 
 
@@ -91,14 +99,18 @@ class Lead(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     created_by = models.ForeignKey(User,on_delete=models.SET_NULL,blank=True,null=True)
-"""
+
+    def __str__(self):
+        return f"{self.name}({self.company_name})"
+  
+    """
     def converte(self):
         self.is_converted = True
         self.converted_at = timezone.now()
         self.save(update_fields=["is_converted","converted_at"])"""
         
 
-"""
+    """
     def save(self, *args, **kwargs):
         # Deal ثبت زمان تبدیل به 
         if self.pk:  

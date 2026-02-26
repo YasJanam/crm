@@ -20,7 +20,7 @@ class DealStageHistorySerializer(serializers.ModelSerializer):
     stage = StageSerializer(read_only=True)
     class Meta:
         model = DealStageHistory
-        fields = ['deal','stage','entered_at','exited_at',
+        fields = ['id','deal','stage','entered_at','exited_at',
                   'is_lost',]
 
 
@@ -34,13 +34,17 @@ class DealSerializer(serializers.ModelSerializer):
     company_id = serializers.IntegerField(write_only=True)
     assigned_to_id = serializers.CharField(write_only=True)
 
+    current_stage = StageSerializer(read_only=True)
+    current_stage_id = serializers.IntegerField(write_only=True)
+
     class Meta:
         model = Deal
-        fields = ['company', 'title', 'amount', 'status','stages',
+        fields = ['id','company', 'title', 'amount', 'status','stages',
                     'assigned_to', 'is_deleted','probability',
                     'created_at', 'updated_at', 'created_by',
                     'company_id','assigned_to_id',
-                    'lost_reason',
+                    'lost_reason', 'current_stage',
+                    'current_stage_id',
                     'lead','closed_at',]
         
         read_only_fields = ['created_at', 'updated_at', 'created_by',]
@@ -55,6 +59,10 @@ class DealSerializer(serializers.ModelSerializer):
             validated_data['assigned_to'] = User.objects.get(
                 id = validated_data.pop('assigned_to_id')
             )
+        if 'current_stage_id' in validated_data:
+            validated_data['current_stage'] = Stage.objects.get(
+                id= validated_data.pop('current_stage_id')
+            )
         return super().create(validated_data)
     
 
@@ -66,6 +74,10 @@ class DealSerializer(serializers.ModelSerializer):
         if 'assigned_to_id' in validated_data:
             validated_data['assigned_to'] = User.objects.get(
             id = validated_data.pop('assigned_to_id')
+            )
+        if 'current_stage_id' in validated_data:
+            validated_data['current_stage'] = Stage.objects.get(
+                id= validated_data.pop('current_stage_id')
             )
         return super().update(instance, validated_data)
     
@@ -82,7 +94,7 @@ class NegotiationSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Negotiation
-        fields = ['deal', 'negotiator', 'proposed_amount', 'discount_percent', 'title',
+        fields = ['id','deal', 'negotiator', 'proposed_amount', 'discount_percent', 'title',
                      'goal', 'summary', 'description', 'result', 'start_time', 'end_time',
                        'is_deleted', 'created_at', 'updated_at', 'created_by',]
         read_only_fields = ['updated_at','created_at', 'created_by',]

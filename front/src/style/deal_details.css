@@ -1,0 +1,213 @@
+
+.deal-details{
+    max-width: 40%;
+    float: center;
+    margin-top:3%;
+    border: 2px solid rgb(203, 203, 212);
+    padding: 10px;
+    
+    /*box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);*/
+}
+
+.deal-details h2{
+  color: rgb(19, 145, 222);
+  text-align: center;
+}
+
+.deal-details input{
+    padding: 9px;
+    border-radius: 5px;
+    max-width: 68%;
+}
+
+.deal-details label{
+  
+  min-width: 100px;
+  font-weight: bold;
+  color: #040404;
+  font-size: 1.0rem;
+  margin: 10px;  
+}
+
+.deal-details-container{
+  margin: 6px 0px 6px 0px;
+  padding: 6px 0px 6px 0px;
+
+ 
+}
+.deal-details-info-row {
+  max-width: 50%;
+  margin:6px 0px  9px;
+  padding: 4px;
+  line-height: center;
+  align-items: flex-start;
+  border: 2px solid #e9ecf2;
+  height: 50%;
+  border-radius: 20px;
+  text-align: center;
+}
+
+
+.deal-details-info-row:hover{
+  margin-bottom: 6px 0px  9px;
+  align-items: flex-start;
+  border: 2px solid #e8ecf1;
+  background-color: #e8ecf1;
+  border-radius: 20px;
+  text-align: center;
+}
+
+
+
+.deal-details-value {
+ 
+  color: #010101;
+  flex: 1;
+  font-weight: bold;
+  
+}
+
+
+
+/* ------ status buttons -----*/
+.open-button{
+  margin: 5px;
+  padding: 10px;
+  background-color:rgb(0, 0, 156);
+  color:white;
+  font-size: 16px;
+  font-weight: bold;
+}
+.open-button:hover{
+  margin: 5px;
+  padding: 10px;
+  background-color:rgb(85, 85, 255);
+  color:white;
+  font-size: 16px;
+  font-weight: bold;
+}
+
+.button-disable{
+  margin: 5px;
+  padding: 5px;
+  background-color:rgb(150, 150, 161);
+  color:white;
+  font-size: 16px;
+  font-weight: bold;
+}
+
+.button-disable:hover{
+  margin: 5px;
+  padding: 5px;
+  background-color:rgb(150, 150, 161);
+  color:white;
+  font-size: 16px;
+  font-weight: bold;
+}
+
+
+.win-button{
+  margin: 5px;
+  padding: 10px;
+  background-color:rgb(5, 180, 3);
+  color:white;
+  font-size: 16px;
+  font-weight: bold;
+  
+}
+.win-button:hover{
+  margin: 5px;
+  padding: 10px;
+  background-color:rgb(36, 228, 2);
+  color:white;
+  font-size: 16px;
+  font-weight: bold;
+}
+
+
+
+
+.lose-button{
+  margin: 5px;
+  padding: 10px;
+  background-color:rgb(204, 17, 79);
+  color:white;
+  font-size: 16px;
+  font-weight: bold;
+  
+}
+.lose-button:hover{
+  margin: 5px;
+  padding: 10px;
+  background-color:rgb(252, 38, 117);
+  color:white;
+  font-size: 16px;
+  font-weight: bold;
+}
+
+
+/* ---- select -----*/
+.reasons{
+    padding: 9px;
+    border-radius: 5px;
+    max-width: 68%;
+}
+
+
+
+/* ------------- company ---------------*/
+.deal-company{
+    max-width: 60%;
+    float: right;
+    margin-top:3%;
+    border: 2px solid rgb(255, 255, 255);
+    padding-right: 2%;
+    padding-left: 1%;
+    /*box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);*/
+}
+
+.deal-company h2{
+  text-align: center;
+  color: rgb(25, 138, 229);
+}
+
+.deal-company input{
+    padding: 9px;
+    border-radius: 5px;
+    max-width: 60%;
+  
+}
+
+
+
+.deal-company label{
+ 
+  min-width: 100px;
+  font-weight: bold;
+  color: #040404;
+  font-size: 1.0rem;
+  margin: 10px;  
+}
+
+.deal-company-container{
+  padding: 3px;
+  margin: 5px;
+}
+
+
+.deal-company textarea{
+  width: 40%;
+  border: 2px solid rgb(64, 199, 252);
+  border-radius: 7px;
+  height: 60px;
+  padding: 10px;
+  margin: 3px;
+  font-size: 17px;
+  float: center;
+}
+
+
+
+
+
+

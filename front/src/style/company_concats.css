@@ -1,0 +1,56 @@
+
+.company-concats-table-container {
+    width: 100%;
+    float: center;
+    padding: 3px;
+
+   
+}
+
+
+.company-concats-table-container h4{
+    float: right;
+    padding-bottom: 6px;
+}
+
+
+.concats-table-header-row {
+  background-color: rgb(252, 159, 206);
+  color: rgb(0, 0, 0);
+  line-height: 0.93rem;
+  font-weight: 600;
+  text-align: center;
+}
+
+
+.contant-table-row {
+  border-bottom: 1px solid #f3f3f3;
+  transition: all 0.3s ease;
+}
+
+.contant-table-row:hover {
+  background: #f4f4f4;
+  transform: translateY(-2px);
+  border-radius: 8px;
+}
+
+.contant-table-row td {
+  padding: 10px;
+  color: #000000;
+  line-height: 1.1rem;
+  border-left: 1px solid #f0f0f0;
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.contant-table-row td:nth-child(3) {
+  color: #1e3c72;
+  font-weight: bold;
+
+}
+
+.contant-table-row td:nth-child(4) {
+  color: #1e3c72;
+  font-weight: bold;
+
+}

@@ -1,0 +1,24 @@
+
+.back-front-actions{
+    float:left;
+}
+.back-front-actions button {
+    padding: 2px;
+    background-color:rgb(255, 255, 255);
+    font-size: 23px;
+    font-weight:bold ;
+    color: black;
+    
+    
+}
+
+.back-front-actions button:hover {
+    padding: 2px;
+    
+    background-color:rgb(255, 255, 255);
+    font-size: 23px;
+    font-weight:bold ;
+    color: black;
+}
+
+

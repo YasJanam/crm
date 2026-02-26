@@ -22,9 +22,11 @@ class DealStageHistoryViewSet(ModelViewSet):
     serializer_class = DealStageHistorySerializer
 
     def get_queryset(self):
-        qs = DealStageHistory.objects.filter(
-            is_deleted=False
-        )
+        qs = DealStageHistory.objects.all()
+
+        deal_id = self.request.query_params.get('deal_id')
+        if deal_id:
+            qs = qs.filter(deal__id=deal_id)
         return qs 
     
 
@@ -67,8 +69,7 @@ class SaleViewSet(ModelViewSet):
             )
         user_id = self.request.query_params.get('user_id')
         if user_id:
-            qs = Sale.objects.filter(
-                is_deleted=False,
+            qs = qs.filter(
                 saler__id=user_id
             )
         return qs
@@ -118,14 +119,24 @@ class DealViewSet(ModelViewSet):
         qs = Deal.objects.filter(
             is_deleted=False,
             )
+        
         user_id = self.request.query_params.get('user_id')
         if user_id:
-            qs = Deal.objects.filter(
-                is_deleted=False,
+            qs = qs.filter(
                 assigned_to__id=user_id
             )
+
+        search = self.request.query_params.get('search')
+        if search:
+            # normalize 
+            search = search.replace('ي','ی').replace('ك','ک').replace('\u200c','').strip()
+            qs = qs.filter(
+                Q(company__name__icontains=search) |
+                Q(title__icontains=search))  
+                
         return qs
     
+        
     @action(detail=True,methods=['delete'],url_path='delete')
     def delete_object(self,request,pk=None):
         try:
@@ -151,6 +162,9 @@ class DealViewSet(ModelViewSet):
             with transaction.atomic():
                 obj = self.get_object()
                 obj.status = Deal.Status.WON  #obj.Status.WIN
+                """if obj.company.type != Company.Type.CUSTOMER:
+                    obj.company.type = Company.Type.CUSTOMER
+                    obj.company.save()"""
                 obj.closed_at = timezone.now()
                 obj.save()
                 data = DealSerializer(obj)
@@ -161,8 +175,8 @@ class DealViewSet(ModelViewSet):
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
 
-    @action(detail=True,methods=['post'],url_path='lost')
-    def lost_deal(self,request,pk=None):
+    @action(detail=True,methods=['post'],url_path='lose')
+    def lose_deal(self,request,pk=None):
         try:
             with transaction.atomic():
                 obj = self.get_object()
@@ -226,21 +240,32 @@ class DealViewSet(ModelViewSet):
     حرکت به استیج بعدی
     مدل خطی
     """
-    @action(detail=True,methods=['post'],url_path='next-stage')
+    @action(detail=True,methods=['patch'],url_path='next-stage')
     def next_stage(self,request,pk=None):
         try:
             with transaction.atomic():
                 obj = self.get_object()
-                stage_order = request.data.get('stage_order')
+
+                if not obj.current_stage:
+                    next_stage = Stage.objects.all().order_by('order').first()
+                    if not next_stage: 
+                        return Response(
+                            {"error": "No stages found in system"}, 
+                            status=status.HTTP_404_NOT_FOUND
+                        )
+                    obj.move_to_stage(next_stage)
+                    obj.save()
+                    data = DealSerializer(obj)
+                    return Response(data.data,status=status.HTTP_200_OK)
                 
-                stage = Stage.objects.get(order=stage_order)
-                if stage.is_terminal:
+
+                """if obj.current_stage.is_terminal:
                     raise ValidationError({
                         "error":"deal_closed",
                         "detail":"Cannot move stage because this deal is already closed"
-                    })
+                    })"""
                 
-                next_stage = Stage.objects.filter(order__gt=stage_order).order_by('order').first()
+                next_stage = Stage.objects.filter(order__gt=obj.current_stage.order).order_by('order').first()
                 if not next_stage:
                     return Response(
                         {"error": "No next stage found"}, 
@@ -256,7 +281,48 @@ class DealViewSet(ModelViewSet):
                 {'error': str(e)},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
-    
+
+
+    """
+    حرکت به استیج قبلی
+    مدل خطی
+    """
+    @action(detail=True,methods=['patch'],url_path='last-stage')
+    def last_stage(self,request,pk=None):
+        try:
+            with transaction.atomic():
+                obj = self.get_object()
+
+                if not obj.current_stage:
+                    raise ValidationError({
+                        "error": "no_stage",
+                        "detail": "Deal has no current stage"
+                    })
+                
+                if obj.current_stage.order == 0 :
+                    raise ValidationError({
+                        "error":"first_stage",
+                        "detail":"Cannot move stage because this stage is first"
+                    })
+                
+                last_stage = Stage.objects.filter(order__lt=obj.current_stage.order).order_by('-order').first()
+                if not last_stage:
+                    return Response(
+                        {"error": "No last stage found"}, 
+                        status=status.HTTP_404_NOT_FOUND
+                    )
+                
+                obj.move_to_stage(last_stage)
+                obj.save()
+                data = DealSerializer(obj)
+                return Response(data.data,status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response(
+                {'error': str(e)},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+        
+
 
     @action(detail=True,methods=['post'],url_path='assign-user/(?P<user_id>[^/.]+)')
     def assign_user_byid(self,request,pk=None,user_id=None):
@@ -303,3 +369,5 @@ class DealViewSet(ModelViewSet):
                 {'error': str(e)},
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
                 )
+        
+    

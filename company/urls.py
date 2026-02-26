@@ -9,7 +9,7 @@ router = DefaultRouter()
 router.register(r'leads',LeadViewSet,basename='leads')
 
 router.register(r'companies',CompanyViewSet,basename='companies')
-router.register(r'companyContacts',CompanyContactViewSet,basename='companyContacts')
+router.register(r'company/contacts',CompanyContactViewSet,basename='company/contacts')
 
 
 
