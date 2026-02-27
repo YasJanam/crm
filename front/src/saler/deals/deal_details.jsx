@@ -55,6 +55,8 @@ function SalerDealDetails({in_deal,onBack}){
         email:''
     });
 
+    const [showStagesHist,setShowStagesHist] = useState(false);
+    const [showConcats,setShowConcats] = useState(false);
 
     useEffect(() => {
         fetchDeal();
@@ -236,12 +238,33 @@ function SalerDealDetails({in_deal,onBack}){
         }
     }
     
+    const handleConcatActivity = async(concat) => {
+        try{
+            const res = await api.patch(`/company/concats/${concat.id}/`,{
+                is_active:!concat.is_active
+            });
+            setDealChanges(~dealChenge);
+            
+        }catch{
+            toast.error('خطا در فعال/غیرفعال سازی');
+        }
+    }
+
+    const handleDeleteConcat = async(concat) => {
+        try{
+            const res = await api.delete(`/company/concats/${concat.id}/`);
+            setDealChanges(~dealChenge);
+        }catch{
+
+        }
+    }
     
     if(dealLoading){
         return <div>loading ...</div>;
     }
 
     return (<div>
+        
         <div className='back-front-actions'>
             <button onClick={onBack}>←</button>
         </div>
@@ -249,144 +272,12 @@ function SalerDealDetails({in_deal,onBack}){
 
 
 
-{/* ========================== company ====================================== */}
-    {deal.company?(
-        <div className='deal-company'>
-        <h2>شرکت مربوطه</h2>
-
-        <form onSubmit={handleEditCompany}>
-            <div className='deal-company-container'>
-                <label>name</label>
-                <input value={companyForm.name} name='name' onChange={onChangeCompanyForm} />
-            </div>
-           
-
-            <div className='deal-company-container'>
-                <label>abreviation</label>
-                <input value={companyForm.abbreviation} name='abbreviation' onChange={onChangeCompanyForm} />
-            </div>
-            
-
-            <div className='deal-company-container'>
-                <label>phone</label>
-                <input value={companyForm.phone} name='phone' onChange={onChangeCompanyForm} />
-            </div>
-
-            <div className='deal-company-container'>
-                <label>email</label>
-                <input value={companyForm.email} name='email' onChange={onChangeCompanyForm} />
-            </div>
-
-            <div className='deal-company-container'>
-                <label>address</label>
-                <input value={companyForm.address} name='address' onChange={onChangeCompanyForm} />
-            </div>
-
-            <div className='deal-company-container'>
-                <label>industry</label>
-                <input value={companyForm.industry} name='industry' onChange={onChangeCompanyForm}/>
-            </div>
-            
-
-
-            <div className='deal-company-container'>
-               <label>type</label> 
-                <select name='type' value={companyForm.type} onChange={onChangeCompanyForm} className='reasons' style={{width:'19%'}}>
-                    <option value=''></option>
-                    <option value='prospect'>Prospect</option>
-                    <option value='customer'>Customer</option>
-                </select> 
-            </div>
-
-
-            <div className='deal-company-container'>
-                <label>description</label>
-                <br></br>
-                <textarea name='description' onChange={onChangeCompanyForm}>{companyForm.description}</textarea> 
-            </div>
-
-            <div>
-                <button type='submit' className='open-button'>ثبت تغییرات</button>
-                <button type='button' onClick={() => setNewConcat(true)} className='add-concat-btn'>افزودن عضو مرتبط</button>
-            </div>
-        </form>
-
-        {newConcat?
-        (
-        <div className='new-concat'>
-            <button onClick={() => setNewConcat(false)} className='close-concat-form-btn'>❌️</button>
-            <h3>new concat</h3>
-        <form onSubmit={handleAddConcat}>
-            <div>
-                <label>role</label>
-                <input name='role' value={concatForm.role} onChange={handleComcatFormChange}/>
-            </div>
-
-            <div>
-                <label>name</label>
-                <input name='name' value={concatForm.name} onChange={handleComcatFormChange}/>
-            </div>
-
-            <div>
-                <label>phone</label>
-                <input name='phone' value={concatForm.phone} onChange={handleComcatFormChange}
-                 required={concatForm.email?false:true}
-                />
-            </div>
-
-            <div>
-                <label>email</label>
-                <input name='email' value={concatForm.email} onChange={handleComcatFormChange}
-                required={concatForm.phone?false:true}/>
-            </div>
-
-            <p className='foot-p' hidden={concatForm.phone||concatForm.email?true:false}>شماره یا ایمیل را وارد کنید</p>
-
-            <button type='submit' className='open-button'>ثبت</button>
-        </form>
-        </div>
-        ):<></>
-        }
-
-        
-     
-    {concatsLoading?<></>:
-     companyConcats.length?
-       <div className='company-concats-table-container' id='company-concats-table'>
-            <h4>افراد مرتبط با شرکت</h4>
-            <table>
-                <thead className='concats-table-header-row'>
-                    <tr>
-                        <td>role</td>
-                        <td>name</td>
-                        <td>phone</td>
-                        <td>email</td>
-                        <td>active?</td>
-                    </tr>
-                </thead>
-                <tbody>
-                    {companyConcats.map((concat) => (
-                        <tr className='contant-table-row'>
-                            <td>{concat.role}</td>
-                            <td>{concat.name}</td>
-                            <td>{concat.phone}</td>
-                            <td>{concat.email}</td>
-                            <td>{concat.is_active?'yes':'no'}</td>
-                        </tr>
-                    ))}
-                </tbody>
-            </table>
-        </div>
-        :<></> }
-
-
-        </div>):<></>}
-
+<div style={{display:'flex',gap:'15px',alignItems:'flex-start'}}>
 
 {/* ========================= Deal Details ===================================================*/}
 
         <div id='deal-details' className='deal-details'>
-            <h2>فرصت فروش</h2>
+            <h3>فرصت فروش</h3>
 
             <br></br>
             <div>
@@ -531,6 +422,105 @@ function SalerDealDetails({in_deal,onBack}){
     
 
 
+{/* ========================== company ====================================== */}
+    {deal.company?(
+        <div className='deal-company'>
+        <h3>شرکت مربوطه</h3>
+
+        <form onSubmit={handleEditCompany}>
+            <div className='deal-company-container'>
+                <label>name</label>
+                <input value={companyForm.name} name='name' onChange={onChangeCompanyForm} />
+            </div>
+           
+
+            <div className='deal-company-container'>
+                <label>abreviation</label>
+                <input value={companyForm.abbreviation} name='abbreviation' onChange={onChangeCompanyForm} />
+            </div>
+            
+
+            <div className='deal-company-container'>
+                <label>phone</label>
+                <input value={companyForm.phone} name='phone' onChange={onChangeCompanyForm} />
+            </div>
+
+            <div className='deal-company-container'>
+                <label>email</label>
+                <input value={companyForm.email} name='email' onChange={onChangeCompanyForm} />
+            </div>
+
+            <div className='deal-company-container'>
+                <label>address</label>
+                <input value={companyForm.address} name='address' onChange={onChangeCompanyForm} />
+            </div>
+
+            <div className='deal-company-container'>
+                <label>industry</label>
+                <input value={companyForm.industry} name='industry' onChange={onChangeCompanyForm}/>
+            </div>
+            
+
+
+            <div className='deal-company-container'>
+               <label>type</label> 
+                <select name='type' value={companyForm.type} onChange={onChangeCompanyForm} className='reasons' style={{width:'40%'}}>
+                    <option value=''></option>
+                    <option value='prospect'>Prospect</option>
+                    <option value='customer'>Customer</option>
+                </select> 
+            </div>
+
+
+            <div className='deal-company-container'>
+                <label>description</label>
+                <textarea name='description' onChange={onChangeCompanyForm}>{companyForm.description}</textarea> 
+            </div>
+
+            <div style={{margin:'30px'}}>
+                <button type='submit' className='open-button'>ثبت تغییرات</button>
+                <button type='button' onClick={() => setNewConcat(true)} className='add-concat-btn'>افزودن عضو مرتبط</button>
+            </div>
+        </form>
+
+        {newConcat?
+        (
+        <div className='new-concat'>
+            <button onClick={() => setNewConcat(false)} className='close-concat-form-btn'>❌️</button>
+            <h3>new concat</h3>
+        <form onSubmit={handleAddConcat}>
+            <div>
+                <label>role</label>
+                <input name='role' value={concatForm.role} onChange={handleComcatFormChange}/>
+            </div>
+
+            <div>
+                <label>name</label>
+                <input name='name' value={concatForm.name} onChange={handleComcatFormChange}/>
+            </div>
+
+            <div>
+                <label>phone</label>
+                <input name='phone' value={concatForm.phone} onChange={handleComcatFormChange}
+                 required={concatForm.email?false:true}
+                />
+            </div>
+
+            <div>
+                <label>email</label>
+                <input name='email' value={concatForm.email} onChange={handleComcatFormChange}
+                required={concatForm.phone?false:true}/>
+            </div>
+
+            <p className='foot-p' hidden={concatForm.phone||concatForm.email?true:false}>شماره یا ایمیل را وارد کنید</p>
+
+            <button type='submit' className='open-button'>ثبت</button>
+        </form>
+        </div>
+        ):<></>
+        }
+
+        </div>):<></>}
 
 
 {/* ============================ stages hist ======================================================== */}
@@ -538,7 +528,11 @@ function SalerDealDetails({in_deal,onBack}){
     {stageHistLoading?<></>:(
         dealStagesHist.length?  
         <div className='deal-stages-hist-container' id='deal-stages-history'>
-            <h4>تاریخچه</h4>          
+            <h4>تاریخچه استیج</h4>  
+            <button onClick={() => setShowStagesHist(!showStagesHist)}
+                className='open-close-table'
+                >{showStagesHist?'▲':'▼'}</button>
+            
             <table>
                 <thead>
                     <tr className='deal-stages-hist-table-header-row'>
@@ -549,7 +543,7 @@ function SalerDealDetails({in_deal,onBack}){
                     </tr>
                 </thead>
                 <tbody>
-                    {dealStagesHist.map((stage) => (
+                    {showStagesHist?(dealStagesHist.map((stage) => (
                         <tr className='deal-stages-hist-table-row'>
                             <td>{stage.stage.name}({stage.stage.order})</td>
                             <td>
@@ -562,14 +556,55 @@ function SalerDealDetails({in_deal,onBack}){
                             </td>
                             {/*<td>{stage.is_lost?'yes':'no'}</td>*/}
                         </tr>
-                    ))}
+                    ))):<></>}
                    
                 </tbody>
             </table>
         </div>
         : <></> )}
+        
+</div>
 
- 
+
+
+{/* ------------------------------------ company-concats table ---------------------------------- */} 
+    {concatsLoading?<></>:
+     companyConcats.length?
+       <div className='company-concats-table-container' id='company-concats-table'>
+            <h4>افراد مرتبط با شرکت</h4>
+            <table>
+                <thead className='concats-table-header-row'>
+                    <tr>
+                        <td>role</td>
+                        <td>name</td>
+                        <td>phone</td>
+                        <td>email</td>
+                        <td>action?</td>
+                        <td>🗑️</td>
+                    </tr>
+                </thead>
+                <tbody>
+                    {companyConcats.map((concat) => ( 
+                        <tr className='contant-table-row'>
+                            <td>{concat.role}</td>
+                            <td>{concat.name}</td>
+                            <td>{concat.phone}</td>
+                            <td>{concat.email}</td>
+                            <td><button 
+                            className={concat.is_active?'disactive-concat-btn':'active-concat-btn'}
+                            onClick={() => handleConcatActivity(concat)}
+                            >{concat.is_active?'disactive':'active'}</button></td>
+                            <td><button onClick={() => handleDeleteConcat(concat)}
+                                className='disactive-concat-btn'>🗑️</button></td>
+                        </tr>
+                    ))}
+                </tbody>
+            </table>
+        </div>
+        :<></> }
+
+
+
 
         <Toaster 
             position="top-center"

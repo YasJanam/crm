@@ -7,6 +7,7 @@ import SalerDealsPage from './deals/dealpage';
 
 function SalerSidebar() {
     const [currentPage,setCurrentPage] = useState('dashboard');
+    const [showSidebar,setShowSidebar] = useState(true);
 
     const menuItems = [
         {
@@ -15,11 +16,11 @@ function SalerSidebar() {
         },
         {
             id:'deals',
-            label:'فرصت های فروش',
+            label:'فرصت ها',
         },
         {
             id:'leads',
-            label:'سرنخ های فروش',
+            label:'سرنخ ها',
         },
         {
             id:'companies',
@@ -76,8 +77,9 @@ function SalerSidebar() {
 
     return (<div className='sidebar_container'>
 
+        {showSidebar?(
         <div id='saler-sidebar' className='sidebar'>
-
+       
         {menuItems.map((menu) => (
             <div
             key={menu.id}
@@ -91,8 +93,12 @@ function SalerSidebar() {
                    
                 </div>
             </div>
-        ))}
-    </div>
+            ))}
+        </div>):<></>}
+
+        <button onClick={() => setShowSidebar(!showSidebar)} className='hidden-sidebar'>
+            {showSidebar?'◀':'▶'}
+        </button>
 
 
     {/*Saler Content*/}

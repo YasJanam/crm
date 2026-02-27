@@ -1,15 +1,17 @@
 
+
+
 .deal-details{
-    max-width: 40%;
+    max-width: 30%;
     float: center;
     margin-top:3%;
     border: 2px solid rgb(203, 203, 212);
     padding: 10px;
-    
+    border-radius: 14px;
     /*box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);*/
 }
 
-.deal-details h2{
+.deal-details h3{
   color: rgb(19, 145, 222);
   text-align: center;
 }
@@ -17,7 +19,8 @@
 .deal-details input{
     padding: 9px;
     border-radius: 5px;
-    max-width: 68%;
+    max-width: 70%;
+    margin: 5px;
 }
 
 .deal-details label{
@@ -25,7 +28,7 @@
   min-width: 100px;
   font-weight: bold;
   color: #040404;
-  font-size: 1.0rem;
+  font-size: 0.9rem;
   margin: 10px;  
 }
 
@@ -150,25 +153,29 @@
 .reasons{
     padding: 9px;
     border-radius: 5px;
-    max-width: 68%;
+    max-width: 90%;
 }
 
 
-
-/* ------------- company ---------------*/
+/*================================================================================================================*/
+/* ------------------------------------------ company ------------------------------------------------------------*/
 .deal-company{
-    max-width: 60%;
-    float: right;
+  
+    max-width: 30%;
+
     margin-top:3%;
-    border: 2px solid rgb(255, 255, 255);
+    border-radius: 14px;
+    /*border: 2px solid rgb(255, 255, 255);*/
     padding-right: 0.6%;
     padding-left: 0.6%;
-    /*box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);*/
+    /*box-shadow: 0 4px 15px #e5f1ff;*/
     text-align: center;
-    /*border: 2px solid #e8ecf1;*/
+    padding: 4px;
+    border: 2px solid #cacaca;
+    
 }
 
-.deal-company h2{
+.deal-company h3{
   text-align: center;
   color: rgb(25, 138, 229);
 }
@@ -176,8 +183,8 @@
 .deal-company input{
     padding: 9px;
     border-radius: 5px;
-    max-width: 60%;
-  
+    max-width: 70%;
+    font-size: 0.95rem;
 }
 
 
@@ -187,7 +194,7 @@
   min-width: 100px;
   font-weight: bold;
   color: #040404;
-  font-size: 1.0rem;
+  font-size: 0.95rem;
   margin: 10px;  
 }
 
@@ -198,7 +205,7 @@
 
 
 .deal-company textarea{
-  width: 40%;
+  width: 50%;
   border: 2px solid rgb(64, 199, 252);
   border-radius: 7px;
   height: 60px;

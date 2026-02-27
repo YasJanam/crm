@@ -16,7 +16,6 @@
 .deals-table-container {
   margin: 20px auto;
   max-width: 100%;
-  float: left;
 
 }
 
@@ -25,8 +24,7 @@
   width: 100%;
   background: white;
   border-collapse: collapse;
-  border-radius: 8px 8px 0 0;
-  
+  border-radius: 10px 10px 0 0;
   overflow: hidden;
   margin: 0px;
   
@@ -74,7 +72,7 @@
   line-height: 1.0rem;
   border-left: 1px solid #f0f0f0;
   font-size: 16px;
-  font-weight: 600;
+
   text-align: center;
 }
 
