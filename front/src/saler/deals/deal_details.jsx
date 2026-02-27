@@ -47,6 +47,14 @@ function SalerDealDetails({in_deal,onBack}){
         description:deal.company.description || '',
     });
 
+    const [newConcat,setNewConcat] = useState(false);
+    const [concatForm,setConcatForm] = useState({
+        role:'',
+        name:'',
+        phone:'',
+        email:''
+    });
+
 
     useEffect(() => {
         fetchDeal();
@@ -54,7 +62,7 @@ function SalerDealDetails({in_deal,onBack}){
 
     useEffect(() => {
         fetchCompanyConcats();
-    },[]);
+    },[dealChenge]);
 
     useEffect(() => {
         fetchDealStagesHistory();
@@ -78,7 +86,7 @@ function SalerDealDetails({in_deal,onBack}){
 
     const fetchCompanyConcats = async() => {
         try{
-            let url =`/company/contacts?company_id=${deal.company.id}`;
+            let url =`/company/concats?company_id=${deal.company.id}`;
             const res = await api.get(url);
             setCompanyConcats(res.data);
             setConcatsLoading(false);
@@ -98,6 +106,8 @@ function SalerDealDetails({in_deal,onBack}){
             toast.error('خطا در واکشی تاریخچه استیج');
         }
     };
+
+    /* ------------ deal details ------------- */
 
     const changeStage = async(direction) => {
         try{
@@ -146,7 +156,6 @@ function SalerDealDetails({in_deal,onBack}){
         }
     }
 
-
     const fetchLostReasons = async() => {
         try{
             const res = await api.get(`/deal-lost/reasons/`);
@@ -157,6 +166,7 @@ function SalerDealDetails({in_deal,onBack}){
         }
     }
 
+    /* --------- company -------------- */
     const handleSubmitForm = async() => {
         try{
             const res = await api.patch(`/deals/${deal.id}/`,formData);
@@ -191,9 +201,43 @@ function SalerDealDetails({in_deal,onBack}){
             [name]:value
     }));
     }
+
+
+    /* ------------ add concat ------------- */
+    const handleComcatFormChange = (e) => {
+        const {name,value} = e.target;
+
+        setConcatForm(prev => ({
+            ...prev,
+            [name]:value
+        }));
+    }
+
+    const handleAddConcat = async(e) => {
+        try{
+            e.preventDefault();
+            if(concatForm.phone===''&&concatForm.email===''){
+                toast.error('شماره یا ایمیل را وارد کنید');
+                return;
+            }
+            const res = await api.post('/company/concats/',{
+                ...concatForm,
+                company_id:deal.company.id
+            });
+            if(res.status>=200&&res.status<300){
+                toast.success('افزودن عضو مرتبط');
+                setDealChanges(~dealChenge);
+                setTimeout(() => {
+                    setNewConcat(false);
+                },250);
+            }
+        }catch{
+
+        }
+    }
     
     
-    if(dealLoading | stageHistLoading | concatsLoading){
+    if(dealLoading){
         return <div>loading ...</div>;
     }
 
@@ -263,11 +307,51 @@ function SalerDealDetails({in_deal,onBack}){
 
             <div>
                 <button type='submit' className='open-button'>ثبت تغییرات</button>
+                <button type='button' onClick={() => setNewConcat(true)} className='add-concat-btn'>افزودن عضو مرتبط</button>
             </div>
         </form>
+
+        {newConcat?
+        (
+        <div className='new-concat'>
+            <button onClick={() => setNewConcat(false)} className='close-concat-form-btn'>❌️</button>
+            <h3>new concat</h3>
+        <form onSubmit={handleAddConcat}>
+            <div>
+                <label>role</label>
+                <input name='role' value={concatForm.role} onChange={handleComcatFormChange}/>
+            </div>
+
+            <div>
+                <label>name</label>
+                <input name='name' value={concatForm.name} onChange={handleComcatFormChange}/>
+            </div>
+
+            <div>
+                <label>phone</label>
+                <input name='phone' value={concatForm.phone} onChange={handleComcatFormChange}
+                 required={concatForm.email?false:true}
+                />
+            </div>
+
+            <div>
+                <label>email</label>
+                <input name='email' value={concatForm.email} onChange={handleComcatFormChange}
+                required={concatForm.phone?false:true}/>
+            </div>
+
+            <p className='foot-p' hidden={concatForm.phone||concatForm.email?true:false}>شماره یا ایمیل را وارد کنید</p>
+
+            <button type='submit' className='open-button'>ثبت</button>
+        </form>
+        </div>
+        ):<></>
+        }
+
         
      
-    {companyConcats.length?
+    {concatsLoading?<></>:
+     companyConcats.length?
        <div className='company-concats-table-container' id='company-concats-table'>
             <h4>افراد مرتبط با شرکت</h4>
             <table>
@@ -294,6 +378,7 @@ function SalerDealDetails({in_deal,onBack}){
             </table>
         </div>
         :<></> }
+
 
         </div>):<></>}
 
@@ -440,7 +525,6 @@ function SalerDealDetails({in_deal,onBack}){
                 </div>
             </div>
 
-
             <button onClick={handleSubmitForm} className='open-button'>ذخیره تغییرات</button>
         </div>
         </div>
@@ -451,7 +535,8 @@ function SalerDealDetails({in_deal,onBack}){
 
 {/* ============================ stages hist ======================================================== */}
 
-    {dealStagesHist.length?  
+    {stageHistLoading?<></>:(
+        dealStagesHist.length?  
         <div className='deal-stages-hist-container' id='deal-stages-history'>
             <h4>تاریخچه</h4>          
             <table>
@@ -482,7 +567,7 @@ function SalerDealDetails({in_deal,onBack}){
                 </tbody>
             </table>
         </div>
-        : <></> }
+        : <></> )}
 
  
 
