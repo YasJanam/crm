@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import api from '../../api';
 import toast, { Toaster } from 'react-hot-toast';
-import '../../style/deals_table.css';
+import '../../style/sidebar_style.css';
 import SalerDealDetails from './deal_details';
 import '../../style/common.css';
 
@@ -102,23 +102,23 @@ function SalerDealsPage(){
         </div>
         <br></br>
 
-        <div className='deals-table-container'>
-        <div className='search-deals'>
-            <input 
-            type="text"  
-            key="search-input-deal"
-            id="DealSearchInput"
-            onChange={(e) => onChangeSearch(e)}
-            placeholder="جستجو بر اساس نام  ..." 
-            value={query}
-            autoFocus
-            ></input>
-        </div>
+        <div className='table-container'>
+            <div className='input-container'>
+                <input 
+                type="text"  
+                key="search-input-deal"
+                id="DealSearchInput"
+                onChange={(e) => onChangeSearch(e)}
+                placeholder="جستجو بر اساس نام  ..." 
+                value={query}
+                autoFocus
+                ></input>
+            </div>
 
 
-            <table className='products-table'>
+            <table>
                 <thead>
-                    <tr className='table-header-row'>
+                    <tr>
                         <td>title</td>
                         <td>company name</td>
                         <td>amount</td>
@@ -134,7 +134,7 @@ function SalerDealsPage(){
                 </thead>
                 <tbody>
                     {deals.map((deal) => (
-                        <tr className='table-row' onClick={() => onClickDeal(deal)}>
+                        <tr onClick={() => onClickDeal(deal)}>
                             
                                 <td>{deal.title}</td>
                                 <td>{deal.company.name}{deal.company.abbreviation?` (${deal.company.abbreviation})`:''}</td>

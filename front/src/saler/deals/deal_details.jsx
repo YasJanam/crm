@@ -3,9 +3,7 @@ import React, { useEffect, useState } from 'react';
 import api from '../../api';
 import toast, { Toaster } from 'react-hot-toast';
 import '../../style/common.css';
-import '../../style/company_concats.css';
-import '../../style/deal_stage_hist_table.css';
-import '../../style/deal_details.css';
+import '../../style/sidebar_style.css';
 /*
     load company-concats
     load deal-stages history
@@ -55,8 +53,8 @@ function SalerDealDetails({in_deal,onBack}){
         email:''
     });
 
-    const [showStagesHist,setShowStagesHist] = useState(false);
-    const [showConcats,setShowConcats] = useState(false);
+    const [showStagesHist,setShowStagesHist] = useState(true);
+    const [showConcats,setShowConcats] = useState(true);
 
     useEffect(() => {
         fetchDeal();
@@ -276,12 +274,12 @@ function SalerDealDetails({in_deal,onBack}){
 
 {/* ========================= Deal Details ===================================================*/}
 
-        <div id='deal-details' className='deal-details'>
+        <div id='deal-details' className='form-container'>
             <h3>فرصت فروش</h3>
 
             <br></br>
             <div>
-            <div className='deal-details-container'>
+            <div className='input-container'>
                 <label>title</label>
                     <input
                     value={formData.title}
@@ -291,10 +289,10 @@ function SalerDealDetails({in_deal,onBack}){
             </div>
 
 
-            <div className='deal-details-container'>
+            <div className='active-div'>
                 <label>status</label>
-                <div className='deal-details-info-row'>
-                <p className='deal-details-value'>{deal.status}</p>
+                <div className='p-container'>
+                <p>{deal.status}</p>
                 </div>
                 <div id='deal-status-actions'>
                     <button
@@ -304,19 +302,19 @@ function SalerDealDetails({in_deal,onBack}){
                     >open</button>
                     <button 
                     onClick={winDeal}
-                    className={deal.status==='won'?'button-disable':'win-button'}
+                    className={deal.status==='won'?'button-disable':'positive-button'}
                     disabled={deal.status==='won'?true:false}
                     >win (close)</button>
                     <button
                     onClick={loseDeal}
-                    className={deal.status==='lost'?'button-disable':'lose-button'}
+                    className={deal.status==='lost'?'button-disable':'negative-button'}
                     disabled={deal.status==='lost'?true:false}
                     >lose (close)</button>
                 </div>
             </div>
 
           
-            <div className='deal-details-container'>
+            <div className='input-container'>
                 <label>amount</label>
                     <input
                     value={formData.amount}
@@ -325,7 +323,7 @@ function SalerDealDetails({in_deal,onBack}){
             </div>
 
 
-            <div className='deal-details-container'>
+            <div className='input-container'>
                 <label>probability</label>
                 <input
                     value={formData.probability}
@@ -334,9 +332,9 @@ function SalerDealDetails({in_deal,onBack}){
             </div>
 
 
-        <div className='deal-details-container'>
+        <div className={deal.status==='open'?'active-div':'disactive-div'}>
             <label>currente stage</label>
-            <div className='deal-details-info-row'>
+            <div className={deal.status==='open'?'p-container':'p-container-disactive'}>
                 <p>{deal.current_stage?deal.current_stage.name:''}{deal.current_stage?.order?`(${deal.current_stage.order})`:''}</p>
             </div>
             <div>
@@ -354,14 +352,9 @@ function SalerDealDetails({in_deal,onBack}){
         </div>
          
             
-            {deal.status==='lost'?(<div className='deal-details-container'>
+            {deal.status==='lost'?(<div className='input-container'>
                 <label>lost reason</label>
-                {/*
-                <div className='deal-details-info-row'>
-                <p className='deal-details-value'
-                >{deal.status==='lost'?deal.lost_reason?deal.lost_reason:'':''}</p>
-                </div> */}
-                <select className='reasons'
+                <select
                 value={formData.lost_reason} 
                 onChange={(e) => setFormData(prev => ({...prev, lost_reason: e.target.value}))}
                 >
@@ -376,7 +369,7 @@ function SalerDealDetails({in_deal,onBack}){
         }
 
          
-            <div className='deal-details-container'>
+            <div className='input-container'>
                 <label>expected closed date</label>
                     <input
                     value={
@@ -389,10 +382,10 @@ function SalerDealDetails({in_deal,onBack}){
 
             
             
-            <div className='deal-details-container'>
+            <div className='input-container'>
                 <label>closed at</label>
                 <div id='input-container'>
-                    <div className='deal-details-info-row'>
+                    <div className='p-container'>
                         <p>
                         {
                         deal.closed_at?(`${new Date(deal.closed_at).toLocaleDateString('fa-IR')} (${new Date(deal.closed_at).toLocaleTimeString('fa-IR')})`
@@ -403,10 +396,10 @@ function SalerDealDetails({in_deal,onBack}){
             </div>
 
             
-            <div className='deal-details-container'>
+            <div className='input-container'>
                 <label>created_at</label>
                 <div id='input-container'>
-                    <div className='deal-details-info-row'>
+                    <div className='p-container'>
                         <p>
                         {
                         deal.created_at?(`${new Date(deal.created_at).toLocaleDateString('fa-IR')} (${new Date(deal.created_at).toLocaleTimeString('fa-IR')})`
@@ -424,47 +417,47 @@ function SalerDealDetails({in_deal,onBack}){
 
 {/* ========================== company ====================================== */}
     {deal.company?(
-        <div className='deal-company'>
+        <div className='form-container'>
         <h3>شرکت مربوطه</h3>
 
         <form onSubmit={handleEditCompany}>
-            <div className='deal-company-container'>
+            <div className='input-container'>
                 <label>name</label>
                 <input value={companyForm.name} name='name' onChange={onChangeCompanyForm} />
             </div>
            
 
-            <div className='deal-company-container'>
+            <div className='input-container'>
                 <label>abreviation</label>
                 <input value={companyForm.abbreviation} name='abbreviation' onChange={onChangeCompanyForm} />
             </div>
             
 
-            <div className='deal-company-container'>
+            <div className='input-container'>
                 <label>phone</label>
                 <input value={companyForm.phone} name='phone' onChange={onChangeCompanyForm} />
             </div>
 
-            <div className='deal-company-container'>
+            <div className='input-container'>
                 <label>email</label>
                 <input value={companyForm.email} name='email' onChange={onChangeCompanyForm} />
             </div>
 
-            <div className='deal-company-container'>
+            <div className='input-container'>
                 <label>address</label>
                 <input value={companyForm.address} name='address' onChange={onChangeCompanyForm} />
             </div>
 
-            <div className='deal-company-container'>
+            <div className='input-container'>
                 <label>industry</label>
                 <input value={companyForm.industry} name='industry' onChange={onChangeCompanyForm}/>
             </div>
             
 
 
-            <div className='deal-company-container'>
+            <div className='input-container'>
                <label>type</label> 
-                <select name='type' value={companyForm.type} onChange={onChangeCompanyForm} className='reasons' style={{width:'40%'}}>
+                <select name='type' value={companyForm.type} onChange={onChangeCompanyForm}>
                     <option value=''></option>
                     <option value='prospect'>Prospect</option>
                     <option value='customer'>Customer</option>
@@ -472,23 +465,24 @@ function SalerDealDetails({in_deal,onBack}){
             </div>
 
 
-            <div className='deal-company-container'>
+            <div className='input-container'>
                 <label>description</label>
                 <textarea name='description' onChange={onChangeCompanyForm}>{companyForm.description}</textarea> 
             </div>
 
             <div style={{margin:'30px'}}>
                 <button type='submit' className='open-button'>ثبت تغییرات</button>
-                <button type='button' onClick={() => setNewConcat(true)} className='add-concat-btn'>افزودن عضو مرتبط</button>
+                <button type='button' onClick={() => setNewConcat(true)} className='negative-button'>افزودن عضو مرتبط</button>
             </div>
         </form>
 
         {newConcat?
         (
-        <div className='new-concat'>
-            <button onClick={() => setNewConcat(false)} className='close-concat-form-btn'>❌️</button>
-            <h3>new concat</h3>
+        <div className='active-div'>
+            <button onClick={() => setNewConcat(false)} className='close-btn'>❌️</button>
+            
         <form onSubmit={handleAddConcat}>
+            <h3>new concat</h3>
             <div>
                 <label>role</label>
                 <input name='role' value={concatForm.role} onChange={handleComcatFormChange}/>
@@ -512,7 +506,7 @@ function SalerDealDetails({in_deal,onBack}){
                 required={concatForm.phone?false:true}/>
             </div>
 
-            <p className='foot-p' hidden={concatForm.phone||concatForm.email?true:false}>شماره یا ایمیل را وارد کنید</p>
+            <p className='negative-footer' hidden={concatForm.phone||concatForm.email?true:false}>شماره یا ایمیل را وارد کنید</p>
 
             <button type='submit' className='open-button'>ثبت</button>
         </form>
@@ -527,15 +521,15 @@ function SalerDealDetails({in_deal,onBack}){
 
     {stageHistLoading?<></>:(
         dealStagesHist.length?  
-        <div className='deal-stages-hist-container' id='deal-stages-history'>
+        <div className='table-container' id='deal-stages-history'>
+            
             <h4>تاریخچه استیج</h4>  
             <button onClick={() => setShowStagesHist(!showStagesHist)}
-                className='open-close-table'
                 >{showStagesHist?'▲':'▼'}</button>
-            
             <table>
+
                 <thead>
-                    <tr className='deal-stages-hist-table-header-row'>
+                    <tr>
                         <td>stage</td>
                         <td>entered at</td>
                         <td>exited at</td>
@@ -544,7 +538,7 @@ function SalerDealDetails({in_deal,onBack}){
                 </thead>
                 <tbody>
                     {showStagesHist?(dealStagesHist.map((stage) => (
-                        <tr className='deal-stages-hist-table-row'>
+                        <tr>
                             <td>{stage.stage.name}({stage.stage.order})</td>
                             <td>
                                 {stage.entered_at?(`${new Date(stage.entered_at).toLocaleDateString('fa-IR')} (${new Date(stage.entered_at).toLocaleTimeString('fa-IR')})`)
@@ -570,10 +564,12 @@ function SalerDealDetails({in_deal,onBack}){
 {/* ------------------------------------ company-concats table ---------------------------------- */} 
     {concatsLoading?<></>:
      companyConcats.length?
-       <div className='company-concats-table-container' id='company-concats-table'>
+       <div className='table-container' id='company-concats-table'>
             <h4>افراد مرتبط با شرکت</h4>
+            <button onClick={() => setShowConcats(!showConcats)}
+                >{showConcats?'▲':'▼'}</button>
             <table>
-                <thead className='concats-table-header-row'>
+                <thead>
                     <tr>
                         <td>role</td>
                         <td>name</td>
@@ -584,20 +580,20 @@ function SalerDealDetails({in_deal,onBack}){
                     </tr>
                 </thead>
                 <tbody>
-                    {companyConcats.map((concat) => ( 
-                        <tr className='contant-table-row'>
+                    {showConcats?(companyConcats.map((concat) => ( 
+                        <tr>
                             <td>{concat.role}</td>
                             <td>{concat.name}</td>
                             <td>{concat.phone}</td>
                             <td>{concat.email}</td>
                             <td><button 
-                            className={concat.is_active?'disactive-concat-btn':'active-concat-btn'}
+                            className={concat.is_active?'negative-button':'positive-button'}
                             onClick={() => handleConcatActivity(concat)}
                             >{concat.is_active?'disactive':'active'}</button></td>
                             <td><button onClick={() => handleDeleteConcat(concat)}
-                                className='disactive-concat-btn'>🗑️</button></td>
+                                className='neutral-button'>🗑️</button></td>
                         </tr>
-                    ))}
+                    ))):<></>}
                 </tbody>
             </table>
         </div>
